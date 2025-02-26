@@ -297,22 +297,21 @@ void DBMAN::saveMCUInfo(RobotInformation r){
             return;
         }
 
-    str="SELECT 1 from servodata WHERE mcu_id = ? AND servoId = ?";
+    str="SELECT 1 from servodata WHERE mcu_id = ?";
     sqlite3_prepare_v2(DB,str.c_str(),str.length(),&pstmt,nullptr);
-        sqlite3_bind_text(pstmt,1,r.mcuName.c_str(),r.mcuName.length(),SQLITE_STATIC);
+        sqlite3_bind_int(pstmt,1,id);
     c=sqlite3_step(pstmt);
         sqlite3_finalize(pstmt);
         pstmt=nullptr;
 
     if(c!=SQLITE_ROW){
-        /** TODO */
         str="INSERT INTO servodata (mcu_id, servoId, servoAngle, pwm_MIN, pwm_MAX, target) VALUES (?,?,?,NULL,NULL,?)";
         for (size_t i = 0; i < r.servoCount; i++){
             sqlite3_prepare_v2(DB,str.c_str(),str.length(),&pstmt,nullptr);
                 sqlite3_bind_int(pstmt,1,id);
                 sqlite3_bind_int(pstmt,2,i);
                 if(r.servoPositions[i]==NULL){sqlite3_bind_null(pstmt,3);}else{sqlite3_bind_int(pstmt,3,r.servoPositions[i]);}
-                if(r.targetPositions[i]==NULL){sqlite3_bind_int(pstmt,6,0);}else{sqlite3_bind_int(pstmt,6,r.targetPositions[i]);}
+                if(r.targetPositions[i]==NULL){sqlite3_bind_int(pstmt,6,0);}else{sqlite3_bind_int(pstmt,4,r.targetPositions[i]);}
             c=sqlite3_step(pstmt);
                 sqlite3_finalize(pstmt);
                 pstmt=nullptr;
