@@ -216,8 +216,9 @@ void srvCore::usrLogIn(SOCKET s){
     ActiveControllers.push_back(ControllerInfo(s,RobotInformation(),true));
 }
 
+#define MAXREADCYCLES 2
 std::string srvCore::readSocket(SOCKET s){
-    int i;
+    int i=0; uint8_t rc=0;
     char rcvB[RCV_BF_LEN];
     std::string str = "";
     memset(rcvB, 0, sizeof rcvB);
@@ -228,8 +229,10 @@ std::string srvCore::readSocket(SOCKET s){
             /* https://learn.microsoft.com/en-us/windows/win32/winsock/windows-sockets-error-codes-2 */
             if(i==SOCKET_ERROR){writeToLog("WSA Error:",std::to_string(WSAGetLastError()).data());rmvSock(s);return "WSAERR";} 
         str.append(rcvB, i);
-    } while (i==RCV_BF_LEN);
-
+        rc++;
+    } while (i==RCV_BF_LEN && rc<MAXREADCYCLES);
+    
+    memset(rcvB, 0, sizeof rcvB);
     writeQueryToLog(str.data());
     return str;
 }
@@ -302,15 +305,13 @@ void srvCore::runServer(){
         //Give the sck list to select
         switch (select(0,&rSCK,NULL,NULL,&timeout)){
             case -1:
-                /* Select Error - handle it? */
+                /* #To-Do: Select Error - handle it? */
                 break;
             case 0:
                 /* Timeout - Shoould happen every 10s, used to check if shutdown was issued */
                 break;
             default:
                 /* At least 1 sck is ready to accept/read */
-
-                // for(auto &&sck : rSCK.fd_array){}
                 
                 for (int i=0; i<rSCK.fd_count; i++){
                     SOCKET sck = rSCK.fd_array[i];

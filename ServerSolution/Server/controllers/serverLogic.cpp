@@ -2,7 +2,7 @@
 #include <cstring>
 
 inline bool checkHeader(std::string query){
-    return (query.compare(0,HEADERLEN,HEADERTXT)==0 && query.compare(query.length()-TAILLEN,TAILLEN,TAILTXT)==0);
+    return (query.length()>=(TAILLEN+HEADERLEN+CODELEN) ? (query.compare(0,HEADERLEN,HEADERTXT)==0 && query.compare(query.length()-TAILLEN,TAILLEN,TAILTXT)==0) : false);
 }
 
 std::string serverLogic::dispatchEMOD(uint8_t eMOD,ControllerInfo* c){
@@ -26,9 +26,9 @@ std::string serverLogic::dispatchSRVP(char* bquery,ControllerInfo* c){
 
     uint8_t numServ=query.at(8);
     uint8_t tmpID=0,tPos=0;
-    query=query.substr(10,(4*numServ)-1);
     if((*c).mcuInfo.servoCount<numServ){return QueryGenerator().nack(_NACK_ServoCountMissmatch);}
     if((*c).mcuInfo.servos_MIN_MAX.empty() && (!(*c).mcuInfo.smartMCU)){return QueryGenerator().nack(_NACK_NoMCUInfo);}
+    query=query.substr(10,(4*numServ)-1);
     for (size_t i = 0; i < numServ; i++){
         tmpID=query.at(i*4)-1;
         tPos=query.at(2+i*4);
@@ -37,8 +37,8 @@ std::string serverLogic::dispatchSRVP(char* bquery,ControllerInfo* c){
         (*c).mcuInfo.targetPositions[tmpID]=tPos;
     }
     
-    std::string rq="ACK";
     if((*c).mcuInfo.updateFlag==0){return QueryGenerator().nack(_NACK_InvalidParameter);}
+    std::string rq="ACK";
 
     if((*c).updateOnRealTime){
         
@@ -54,7 +54,7 @@ std::string serverLogic::dispatchSRVP(char* bquery,ControllerInfo* c){
 
         if((*c).mcuInfo.smartMCU){
             rq=srvCore::contactMCU((*c).mcuInfo.mcuName.c_str(),QueryGenerator().smrt_updtServo((*c).mcuInfo.updateFlag,(*c).mcuInfo.targetPositions));
-            (*c).mcuInfo.updateFlag=0;
+            // (*c).mcuInfo.updateFlag=0;
         }    
     }
 
@@ -75,7 +75,6 @@ std::string serverLogic::dispatchSRVP(char* bquery,ControllerInfo* c){
 }
 
 std::string serverLogic::dispatchMALL(ControllerInfo* c){
-
     if((*c).mcuInfo.mcuName.empty()){return QueryGenerator().nack(_NACK_NoActiveMCU);}
     if(!srvCore::isMCUOnline((*c).mcuInfo.mcuName.c_str())){return QueryGenerator().nack(_NACK_MCUOffline);}
 
@@ -89,7 +88,7 @@ std::string serverLogic::dispatchMALL(ControllerInfo* c){
     }else{
         /* Dumb mode */
         if((*c).mcuInfo.servos_MIN_MAX.empty()){return QueryGenerator().nack(_NACK_NoMCUInfo);}
-        if((*c).mcuInfo.updateFlag==0){return QueryGenerator().nack(_NACK_NoMCUInfo);}
+        if((*c).mcuInfo.updateFlag==0){return QueryGenerator().nack(_NACK_InvalidParameter);}
         query=srvCore::contactMCU((*c).mcuInfo.mcuName.c_str(),QueryGenerator().dmb_mvServo((*c).mcuInfo.updateFlag,(*c).mcuInfo.targetPositions,(*c).mcuInfo.servos_MIN_MAX));
     }
     if(strcmp(&query[0],"ACK")){return QueryGenerator().nack(_NACK_ErrorContactingMCU);}
@@ -107,7 +106,6 @@ std::string serverLogic::dispatchMALL(ControllerInfo* c){
 }
 
 std::string serverLogic::dispatchSMCU(char* bquery,ControllerInfo* c){
-    
     std::string query = "";
     query.clear();
     query.append(bquery);
@@ -116,6 +114,7 @@ std::string serverLogic::dispatchSMCU(char* bquery,ControllerInfo* c){
     query=query.substr(8,query.size()-11);
 
     (*c).mcuInfo=DBMAN::getMCUInfo(query.data());
+    if((*c).mcuInfo.updateFlag!=0){(*c).updateOnRealTime=false;}
     if(!(*c).mcuInfo.mcuName.compare(query)){
         return QueryGenerator().ack(_ACK_Generic);
     }
@@ -157,15 +156,18 @@ std::string serverLogic::dispatchUINF(char* bquery,ControllerInfo* c){
 }
 
 int serverLogic::checkLogInQuery(std::string q){
-    if(q.compare(HEADERLEN,12,"NodeMCU_here")==0){return MCUHELLOQUERY;}
-    if(q.compare(HEADERLEN,11,"Client_here")==0){return USRHELLOQUERY;}
+    if(checkHeader(q)){
+        if(q.compare(HEADERLEN,12,"NodeMCU_here")==0){return MCUHELLOQUERY;}
+        if(q.compare(HEADERLEN,11,"Client_here")==0){return USRHELLOQUERY;}
+    }
     return BADQUERY;
 }
 
 RobotInformation serverLogic::getQueryInformation(std::string q){
+    //#To-Do: Check that servo positions are coherent (Within 1-181 range)
 
     /* !s-NodeMCU_here-[info]-e! */
-    std::string tmp=q.substr(16,q.size()-19);
+    std::string tmp=q.substr(16,q.size()-19); 
 
     /* [info] mcuName-<servocount>-<pos0>-<pos1>...*/
         // dumbMCU-<servocount>-<187> {!s-NodeMCU_here-dumbMCU-<servocount>-<187>-e!}
@@ -188,29 +190,6 @@ RobotInformation serverLogic::getQueryInformation(std::string q){
 
 void serverLogic::handleQuery(std::string q, ControllerInfo* c){
 
-    /* !s-<query body>-e! */
-        
-        /* <QueryType>:<param1>-<param2> */
-
-        /* Query Type */
-        // sOFF - Server off
-
-        //  NodeMCU_here - hello from nodeMCU board, +info
-        //  Client_here - hello from client, no extra params
-
-        //  _ACK - ok msg, param1 expected
-        //  NACK - error msg, param1 expected
-
-        //  eMOD - updateModeRT(RT/delayed), param1 expected (1-Delayed, 2-RealTime)
-        //  SRVP - changeServoPosition, param1 (servoID), param2 (servoPosition)
-        //  mALL - moveAll servos - AKA execute movement update
-
-
-        /* param1 */
-        //  param1=ACK code for ACK query
-        //  param1=1/2 for updateModeRT queries
-        //  param1=servoID for changeServoPosition query
-
     std::string qr = QueryGenerator().nack(_NACK_InvalidQuery);
     if(checkHeader(q)){
 
@@ -228,13 +207,14 @@ void serverLogic::handleQuery(std::string q, ControllerInfo* c){
         //New functionality
         if(!strcmp(code,"sMCU")){delete code;qr=dispatchSMCU(q.data(),c);}
             /* !s-sMCU-mcuName-e! ~ Swap active MCU */
-        // if(!strcmp(code,"iMCU")){delete code;/* Get MCU info */;return 0;}
+        // if(!strcmp(code,"iMCU")){delete code;/* Get MCU info */;return 0;} #To-Do
             /* !s-iMCU-e! ~ Get MCU info */
         if(!strcmp(code,"uINF")){delete code;qr=dispatchUINF(q.data(),c);}
             /* !s-uINF-[data]-e! ~ Upload MCU info (ServoMin/ServoMax PWM parameters) */
 
+        // Server Shutdown
         if(!strcmp(code,"sOFF")){delete code;srvCore::srvUp=false;qr=QueryGenerator().ack(_ACK_Generic);}
-            /* !s-mALL-e! ~ Shutdown server */
+            /* !s-sOFF-e! ~ Shutdown server */
     }
     
     send((*c).controllerSCK,qr.c_str(),qr.size(), 0);
