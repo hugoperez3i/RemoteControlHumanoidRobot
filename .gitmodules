@@ -1,0 +1,4 @@
+[submodule "ServerSolution/Client/lib/GUI/imgui"]
+	path = ServerSolution/Client/lib/GUI/imgui
+	url = https://github.com/ocornut/imgui.git
+	branch = docking
