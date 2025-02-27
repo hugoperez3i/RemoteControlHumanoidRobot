@@ -14,7 +14,7 @@ find_package(Git QUIET)
     execute_process(COMMAND ${GIT_EXECUTABLE} 
         submodule update --init --recursive
     )
-add_subdirectory(lib/GUI/imgui)
+add_subdirectory(lib/GUI)
 
 add_executable(${PROJECT_NAME} main.cpp)
 
@@ -22,3 +22,8 @@ target_link_libraries(${PROJECT_NAME}
     PRIVATE DearImGUI
 )
 
+include(InstallRequiredSystemLibraries)
+set (CPACK RESOURCE FILE LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/License.txt")
+set (CPACK_PACKAGE_VERSION_MAJOR "$(VERSION_MAJOR)")
+set (CPACK_PACKAGE_VERSION_MINOR "${VERSION_MINOR}")
+include(CPack)
