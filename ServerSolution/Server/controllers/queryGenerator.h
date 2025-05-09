@@ -46,7 +46,7 @@ class QueryGenerator{
         /* ACK query */
         std::string nack(uint8_t);
         /* Tell the client the current positions of the MCU */
-        std::string servoPos(uint32_t flag,std::vector<uint8_t> servoPositions); 
+        std::string robotInformation(std::vector<uint8_t> servoPositions); 
         // /* Tell the client the current update (RealTime/Delayed) mode of the MCU */
         // std::string updateMode(char);
 };

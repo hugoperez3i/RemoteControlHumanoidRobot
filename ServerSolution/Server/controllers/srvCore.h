@@ -72,6 +72,7 @@ class srvCore{
         ~srvCore();
         void runServer();
         static void writeDBERRToLog(char*);
+        static void writeCliMSGToLog(std::string); 
         static bool isMCUOnline(const char*);
         static void rmvSock(SOCKET);
         static std::string contactMCU(const char*,std::string query);

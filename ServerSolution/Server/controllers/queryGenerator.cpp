@@ -16,18 +16,15 @@ std::string QueryGenerator::nack(uint8_t code){
     q.replace(8,1,1,code);
     return q;
 }
-std::string QueryGenerator::servoPos(uint32_t flag, std::vector<uint8_t> pos){
-    /* [!s]-[SRVP]-[number of servos to update]-[servoid:servopos~servoid:servopos]-[e!] */
+std::string QueryGenerator::robotInformation(std::vector<uint8_t> pos){
+    /* [!s]-[iMCU]-[number of servos]-[servopos0-...-servoposN]-[e!] */
     /* [!s-]0-2 (3) Header [xxxx]3-6 (4) Type of Query [x]8(1) Number of servos [servoInfo]10-x((4*NumOfServos)-1) */
-    std::string q = "!s-SRVP-0-";
+    std::string q = "!s-iMCU-0-";
     uint8_t count=0;
-    for (size_t i = 0; i < 27; i++){
-        if(flag&(0b1<<i)==(0b1<<i)){
-            count++;
-            q+=(i+1);q+=":";q+=pos[i];q+="-";
-        }
+    for (auto &&i : pos){
+        q+=i;q+="-";
     }
-    q.replace(8,1,1,count);
+    q.replace(8,1,1,pos.size());
     q+="e!";
     return q;
 }

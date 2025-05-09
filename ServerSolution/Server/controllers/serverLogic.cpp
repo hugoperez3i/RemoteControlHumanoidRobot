@@ -5,13 +5,17 @@ inline bool checkHeader(std::string query){
     return (query.length()>=(TAILLEN+HEADERLEN+CODELEN) ? (query.compare(0,HEADERLEN,HEADERTXT)==0 && query.compare(query.length()-TAILLEN,TAILLEN,TAILTXT)==0) : false);
 }
 
+inline bool checkNulls(std::string query){
+    return query.find((char)0,0) == std::string::npos;
+}
+
 std::string serverLogic::dispatchEMOD(uint8_t eMOD,ControllerInfo* c){
     if(eMOD==_eMOD_Delayed){(*c).updateOnRealTime=false;return QueryGenerator().ack(_eMOD_Delayed);}
     if(eMOD==_eMOD_RealTime){(*c).updateOnRealTime=true;return QueryGenerator().ack(_eMOD_RealTime);}
     return QueryGenerator().nack(_NACK_InvalidParameter); 
 }
 
-std::string serverLogic::dispatchSRVP(char* bquery,ControllerInfo* c){
+std::string serverLogic::validateSRVP(char* bquery,ControllerInfo* c){
 
     if((*c).mcuInfo.mcuName.empty()){return QueryGenerator().nack(_NACK_NoActiveMCU);}
     if(!srvCore::isMCUOnline((*c).mcuInfo.mcuName.c_str())){return QueryGenerator().nack(_NACK_MCUOffline);}
@@ -38,6 +42,36 @@ std::string serverLogic::dispatchSRVP(char* bquery,ControllerInfo* c){
     }
     
     if((*c).mcuInfo.updateFlag==0){return QueryGenerator().nack(_NACK_InvalidParameter);}
+    return QueryGenerator().ack(_ACK_Generic);
+}
+
+std::string serverLogic::dispatchSRVP(char* bquery,ControllerInfo* c){
+
+    if((*c).mcuInfo.mcuName.empty()){return QueryGenerator().nack(_NACK_NoActiveMCU);}
+    if(!srvCore::isMCUOnline((*c).mcuInfo.mcuName.c_str())){return QueryGenerator().nack(_NACK_MCUOffline);}
+
+    // std::string query = "";
+    // query.clear();
+    // query.append(bquery);
+
+    // /* [!s]-[SRVP]-[number of servos to update]-[servoid:servopos~servoid:servopos]-[e!] */
+    // /* [!s-]0-2 (3) Header [xxxx]3-6 (4) Type of Query [x]8(1) Number of servos [servoInfo]10-x((4*NumOfServos)-1) */
+    // /* Servoid and servoposition are sent with a +1 offset as a zero would mean end of stream and cause issues */
+
+    // uint8_t numServ=query.at(8);
+    // uint8_t tmpID=0,tPos=0;
+    // if((*c).mcuInfo.servoCount<numServ){return QueryGenerator().nack(_NACK_ServoCountMissmatch);}
+    // if((*c).mcuInfo.servos_MIN_MAX.empty() && (!(*c).mcuInfo.smartMCU)){return QueryGenerator().nack(_NACK_NoMCUInfo);}
+    // query=query.substr(10,(4*numServ)-1);
+    // for (size_t i = 0; i < numServ; i++){
+    //     tmpID=query.at(i*4)-1;
+    //     tPos=query.at(2+i*4);
+    //     if(tmpID>(*c).mcuInfo.servoCount || tPos>181){return QueryGenerator().nack(_NACK_InvalidParameter);}
+    //     (*c).mcuInfo.updateFlag|=(0b1<<tmpID); 
+    //     (*c).mcuInfo.targetPositions[tmpID]=tPos;
+    // }
+    
+    // if((*c).mcuInfo.updateFlag==0){return QueryGenerator().nack(_NACK_InvalidParameter);}
     std::string rq="ACK";
 
     if((*c).updateOnRealTime){
@@ -121,6 +155,12 @@ std::string serverLogic::dispatchSMCU(char* bquery,ControllerInfo* c){
     return QueryGenerator().nack(_NACK_NoActiveMCU);
 }
 
+std::string serverLogic::dispatchIMCU(ControllerInfo* c){
+    if((*c).mcuInfo.mcuName.empty()){return QueryGenerator().nack(_NACK_NoActiveMCU);}
+
+    return QueryGenerator().robotInformation((*c).mcuInfo.servoPositions);
+}
+
 std::string serverLogic::dispatchUINF(char* bquery,ControllerInfo* c){
     if((*c).mcuInfo.mcuName.empty()){return QueryGenerator().nack(_NACK_NoActiveMCU);}
 
@@ -191,32 +231,45 @@ RobotInformation serverLogic::getQueryInformation(std::string q){
 void serverLogic::handleQuery(std::string q, ControllerInfo* c){
 
     std::string qr = QueryGenerator().nack(_NACK_InvalidQuery);
-    if(checkHeader(q)){
+    if(checkHeader(q) && checkNulls(q)){
 
         char* code = new char[5];
         memcpy(code,q.data()+3,4);
         code[4]=0;
         //Retrocompatibility with firebase client
-        if(!strcmp(code,"SRVP")){delete code;qr=dispatchSRVP(q.data(),c);}
-            /* !s-SRVP-<Number of servos to update>-<servoid>:<position>-e! -> [!s][SRVP][number of servos to update][servoid:servopos~servoid:servopos][e!] */
-        if(!strcmp(code,"eMOD")){delete code;qr=dispatchEMOD(q.at(PARAM1_POSITION),c);}
-            /* !s-eMOD-[_eMOD_Delayed/_eMOD_RealTime]-e! ~ Used to change from Realtime updates to delayed mode */
-        if(!strcmp(code,"mALL")){delete code;qr=dispatchMALL(c);} 
-            /* !s-mALL-e! ~ IF on delayed mode, execute target movements */
+        /* !s-SRVP-<Number of servos to update>-<servoid>:<position>-e! -> [!s][SRVP][number of servos to update][servoid:servopos~servoid:servopos][e!] */
+        if(!strcmp(code,"SRVP")){
+            delete code;
+            qr=validateSRVP(q.data(),c);
+                srvCore::writeCliMSGToLog(qr);
+                send((*c).controllerSCK,qr.c_str(),qr.size(), 0);
+            qr=dispatchSRVP(q.data(),c);
+        }
+        /* !s-eMOD-[_eMOD_Delayed/_eMOD_RealTime]-e! ~ Used to change from Realtime updates to delayed mode */
+        if(!strcmp(code,"eMOD")){
+            delete code;
+            qr=dispatchEMOD(q.at(PARAM1_POSITION),c);
+        }
+        /* !s-mALL-e! ~ IF on delayed mode, execute target movements */
+        if(!strcmp(code,"mALL")){
+            delete code;
+            qr=dispatchMALL(c);
+        } 
 
         //New functionality
+        /* !s-sMCU-mcuName-e! ~ Swap active MCU */
         if(!strcmp(code,"sMCU")){delete code;qr=dispatchSMCU(q.data(),c);}
-            /* !s-sMCU-mcuName-e! ~ Swap active MCU */
-        // if(!strcmp(code,"iMCU")){delete code;/* Get MCU info */;return 0;} #To-Do
-            /* !s-iMCU-e! ~ Get MCU info */
+        /* !s-iMCU-e! ~ Get MCU info */
+        if(!strcmp(code,"iMCU")){delete code;qr=dispatchIMCU(c);} 
+        /* !s-uINF-[data]-e! ~ Upload MCU info (ServoMin/ServoMax PWM parameters) */
         if(!strcmp(code,"uINF")){delete code;qr=dispatchUINF(q.data(),c);}
-            /* !s-uINF-[data]-e! ~ Upload MCU info (ServoMin/ServoMax PWM parameters) */
 
         // Server Shutdown
+        /* !s-sOFF-e! ~ Shutdown server */
         if(!strcmp(code,"sOFF")){delete code;srvCore::srvUp=false;qr=QueryGenerator().ack(_ACK_Generic);}
-            /* !s-sOFF-e! ~ Shutdown server */
     }
     
     send((*c).controllerSCK,qr.c_str(),qr.size(), 0);
+    srvCore::writeCliMSGToLog(qr);
     return;
 }

@@ -52,7 +52,7 @@ void srvCore::writeQueryToLog(char* s){
     std::string s1(s);std::string s2="";
     for(char c : s1){if(std::isprint((uint8_t)c)){s2+=c;} else {s2+=std::to_string((uint8_t)c);}}
 
-    std::string e = "\n["+std::string(timeBuffer)+"."+std::to_string(milliseconds.count())+"] New query -> "+s2;
+    std::string e = "\n["+std::string(timeBuffer)+"."+std::to_string(milliseconds.count())+"] Incoming query -> "+s2;
 
     {std::lock_guard<std::mutex> lck(mtxLOG);
         queueLOG.push(e);}
@@ -77,6 +77,24 @@ void srvCore::writeMCUMSGToLog(std::string s){
     condLOG.notify_one();
 #endif
 }
+void srvCore::writeCliMSGToLog(std::string s){
+    #ifdef LOGGER 
+        char timeBuffer[20]; 
+        auto now = std::chrono::system_clock::now();
+        auto t = std::chrono::system_clock::to_time_t(now);
+        auto milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()) % 1000;
+        std::strftime(timeBuffer, sizeof(timeBuffer), "%d/%m/%Y %H:%M:%S", std::localtime(&t));
+    
+        std::string s2="";
+        for(char c : s){if(std::isprint((uint8_t)c)){s2+=c;} else {s2+=std::to_string((uint8_t)c);}}
+    
+        std::string e = "\n["+std::string(timeBuffer)+"."+std::to_string(milliseconds.count())+"] Response to Client -> "+s2;
+    
+        {std::lock_guard<std::mutex> lck(mtxLOG);
+            queueLOG.push(e);}
+        condLOG.notify_one();
+    #endif
+    }
 void srvCore::writeDBERRToLog(char* s){
 #ifdef LOGGER 
     char timeBuffer[20]; 
