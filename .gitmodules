@@ -1,4 +1,3 @@
-[submodule "ServerSolution/Client/lib/GUI/imgui"]
-	path = ServerSolution/Client/lib/GUI/imgui
-	url = https://github.com/ocornut/imgui.git
-	branch = docking
+[submodule "ServerSolution/Client/Java-Client"]
+	path = ServerSolution/Client/Java-Client
+	url = https://github.com/hugoperez3i/Robot-Control-Application
