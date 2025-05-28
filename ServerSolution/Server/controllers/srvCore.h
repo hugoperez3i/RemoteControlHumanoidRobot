@@ -6,8 +6,8 @@
 
 #define LOGGER /* Comment this line to disable logging */
 
-#include <windows.h>
 #include <winsock2.h>
+#include <windows.h>
 #include <ws2tcpip.h>
 #include <iostream>
 #include <mutex>
@@ -76,5 +76,5 @@ class srvCore{
         static bool isMCUOnline(const char*);
         static void rmvSock(SOCKET);
         static std::string contactMCU(const char*,std::string query);
-
+        static void freeMCU(const char*);
 };

@@ -15,8 +15,9 @@ std::string serverLogic::dispatchEMOD(uint8_t eMOD,ControllerInfo* c){
     return QueryGenerator().nack(_NACK_InvalidParameter); 
 }
 
-std::string serverLogic::validateSRVP(char* bquery,ControllerInfo* c){
+std::string serverLogic::validateSRVP(char* bquery,ControllerInfo* c, bool* cont){
 
+    *cont=false;
     if((*c).mcuInfo.mcuName.empty()){return QueryGenerator().nack(_NACK_NoActiveMCU);}
     if(!srvCore::isMCUOnline((*c).mcuInfo.mcuName.c_str())){return QueryGenerator().nack(_NACK_MCUOffline);}
 
@@ -42,6 +43,7 @@ std::string serverLogic::validateSRVP(char* bquery,ControllerInfo* c){
     }
     
     if((*c).mcuInfo.updateFlag==0){return QueryGenerator().nack(_NACK_InvalidParameter);}
+    *cont=true;
     return QueryGenerator().ack(_ACK_Generic);
 }
 
@@ -144,9 +146,14 @@ std::string serverLogic::dispatchSMCU(char* bquery,ControllerInfo* c){
     query.clear();
     query.append(bquery);
 
+    if(query.length()==11){
+        return QueryGenerator().nack(_NACK_NoActiveMCU);
+    }
+
     /* !s-sMCU-[mcuName]-e! */
     query=query.substr(8,query.size()-11);
 
+    srvCore::freeMCU(query.data());
     (*c).mcuInfo=DBMAN::getMCUInfo(query.data());
     if((*c).mcuInfo.updateFlag!=0){(*c).updateOnRealTime=false;}
     if(!(*c).mcuInfo.mcuName.compare(query)){
@@ -157,7 +164,8 @@ std::string serverLogic::dispatchSMCU(char* bquery,ControllerInfo* c){
 
 std::string serverLogic::dispatchIMCU(ControllerInfo* c){
     if((*c).mcuInfo.mcuName.empty()){return QueryGenerator().nack(_NACK_NoActiveMCU);}
-
+    (*c).mcuInfo=DBMAN::getMCUInfo((*c).mcuInfo.mcuName.data());
+    if((*c).mcuInfo.mcuName.empty()){return QueryGenerator().nack(_NACK_NoActiveMCU);}
     return QueryGenerator().robotInformation((*c).mcuInfo.servoPositions);
 }
 
@@ -240,9 +248,11 @@ void serverLogic::handleQuery(std::string q, ControllerInfo* c){
         /* !s-SRVP-<Number of servos to update>-<servoid>:<position>-e! -> [!s][SRVP][number of servos to update][servoid:servopos~servoid:servopos][e!] */
         if(!strcmp(code,"SRVP")){
             delete code;
-            qr=validateSRVP(q.data(),c);
+            bool cont=false;
+            qr=validateSRVP(q.data(),c,&cont);
                 srvCore::writeCliMSGToLog(qr);
                 send((*c).controllerSCK,qr.c_str(),qr.size(), 0);
+                if(!cont){return;}
             qr=dispatchSRVP(q.data(),c);
         }
         /* !s-eMOD-[_eMOD_Delayed/_eMOD_RealTime]-e! ~ Used to change from Realtime updates to delayed mode */

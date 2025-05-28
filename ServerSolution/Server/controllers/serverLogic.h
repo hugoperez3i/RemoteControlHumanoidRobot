@@ -28,7 +28,7 @@ class serverLogic{
 
         static std::string dispatchEMOD(uint8_t,ControllerInfo*);
         static std::string dispatchSRVP(char*,ControllerInfo*);
-        static std::string validateSRVP(char*,ControllerInfo*);
+        static std::string validateSRVP(char*,ControllerInfo*,bool*);
         static std::string dispatchMALL(ControllerInfo*);
 
         static std::string dispatchSMCU(char*,ControllerInfo*);

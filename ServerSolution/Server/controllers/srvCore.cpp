@@ -145,10 +145,29 @@ void srvCore::setupDB(){
 }
 
 bool srvCore::isMCUOnline(const char* n){
-    for (auto it=MCUSCK.begin();it<MCUSCK.end();it++){
-        if(!(*it).name.compare(n)){return true;}
+    for (auto it=MCUSCK.begin();it!=MCUSCK.end();it++){
+        if(!(*it).name.compare(n)){
+            
+            // check for possible disconnects 
+            u_long m=1;char tmp[1];
+            ioctlsocket((*it).sck, FIONBIO, &m);
+            int i = recv((*it).sck,tmp,sizeof(tmp),MSG_PEEK);
+            if(i==0 || (i==SOCKET_ERROR && WSAGetLastError()!=WSAEWOULDBLOCK)){writeToLog("MCU Disconnected:", (*it).name.data());it=MCUSCK.erase(it)-1;continue;}
+            m=0;
+            ioctlsocket((*it).sck, FIONBIO, &m); 
+
+            return true;
+        }
     } 
     return false;
+}
+
+void srvCore::freeMCU(const char* n){
+    for (auto &&i : ActiveControllers){
+        if(!i.mcuInfo.mcuName.compare(n)){
+            i.mcuInfo=RobotInformation();
+        }
+    }
 }
 
 srvCore::srvCore(char* ipAddress, int port){
@@ -192,41 +211,55 @@ void srvCore::rmvSock(SOCKET s){
     closesocket(s);
 }
 void srvCore::rmvSockfromVectors(SOCKET s){
-    for (auto it=MCUSCK.begin();it<MCUSCK.end();it++){
+    for (auto it=MCUSCK.begin();it!=MCUSCK.end();it++){
         if((*it).sck==s){MCUSCK.erase(it); return;}
     }    
-    for (auto it=ActiveControllers.begin();it<ActiveControllers.end();it++){
-        if((*it).controllerSCK==s){
-            if(!(*it).mcuInfo.mcuName.empty()){DBMAN::saveMCUInfo((*it).mcuInfo);}
-            ActiveControllers.erase(it); 
-            return;
+    for (auto it=ActiveControllers.begin();it!=ActiveControllers.end();it++){
+        if((*it).controllerSCK==s){ActiveControllers.erase(it); return;
         }
     }        
 }
 
 void srvCore::mcuLogIn(RobotInformation info, SOCKET s){
-    MCUSCK.push_back(MCUSocket(s,info.mcuName));
+
+    // /* https://learn.microsoft.com/en-us/windows/win32/api/winsock/nf-winsock-setsockopt */ 
+    BOOL bOptVal = TRUE; 
+    setsockopt(s, SOL_SOCKET, SO_KEEPALIVE, (char *) &bOptVal, sizeof(bOptVal));
+    // /* https://learn.microsoft.com/en-us/windows/win32/winsock/sio-keepalive-vals */ 
+    struct tcp_keepalive ka;
+        ka.onoff = 1;
+        ka.keepalivetime = 1000;      
+        ka.keepaliveinterval = 1000;  
+    DWORD bytesReturned;
+    WSAIoctl(s, SIO_KEEPALIVE_VALS, &ka, sizeof(ka), nullptr, 0, &bytesReturned, nullptr, nullptr);
+
+    /* Check if self was connected (dc'd -> reconnect) and remove it */
+        // or throw an error if duplicate name
+    if(isMCUOnline(info.mcuName.data())){
+        writeToLog("Duplicate MCU connection attempt:",info.mcuName.data());
+        closesocket(s);
+        return;
+    }
+
     switch(DBMAN::registerMCU(info)){
         case _DBMAN_NEW_S_MCU:writeToLog("New smartMCU registered:",info.mcuName.data()); break;
         case _DBMAN_OLD_S_MCU:writeToLog("New smartMCU connected:",info.mcuName.data()); break;
         case _DBMAN_NEW_D_MCU:writeToLog("New dumbMCU registered:",info.mcuName.data()); break;
         case _DBMAN_OLD_D_MCU:writeToLog("New dumbMCU connected:",info.mcuName.data()); break;
         case _DBMAN_ERROR_INFMISSMATCH:
-            writeToLog("MCU Connection Error: Information Missmatch - MCU:",info.mcuName.data()); 
-            rmvSock(s);
-            writeToLog("Removed errored mcu connection - MCU:",info.mcuName.data()); 
-            break;
+            writeToLog("MCU Connection Error: Information Missmatch -> MCU:",info.mcuName.data()); 
+            writeToLog("Removed errored mcu connection -> MCU:",info.mcuName.data()); 
+            return;
         case _DBMAN_ERROR_REGMCU:
-            writeToLog("Unknown error during mcu login - MCU:",info.mcuName.data()); 
-            rmvSock(s);
-            writeToLog("Removed errored mcu connection - MCU:",info.mcuName.data()); 
-            break;
+            writeToLog("Unknown error during mcu login -> MCU:",info.mcuName.data()); 
+            writeToLog("Removed errored mcu connection -> MCU:",info.mcuName.data()); 
+            return;
         case _DBMAN_ERROR_REGSMCU:
-            writeToLog("Error while updating mcu info at login - MCU:",info.mcuName.data()); 
-            rmvSock(s);
-            writeToLog("Removed errored mcu connection - MCU:",info.mcuName.data()); 
-            break;
+            writeToLog("Error while updating mcu info at login -> MCU:",info.mcuName.data()); 
+            writeToLog("Removed errored mcu connection -> MCU:",info.mcuName.data()); 
+            return;
     }
+    MCUSCK.push_back(MCUSocket(s,info.mcuName));
 }
 
 void srvCore::usrLogIn(SOCKET s){
@@ -255,20 +288,21 @@ std::string srvCore::readSocket(SOCKET s){
     return str;
 }
 
-/* (N)ACK from MCU or -> "DC" if the Socket closes the connection or "E404" if mcuName cannot be found */
+/* (N)ACK from MCU or "E404" if mcuName cannot be found */
 std::string srvCore::contactMCU(const char* mcuName, std::string query){
-    for(auto it=MCUSCK.begin();it<MCUSCK.end();it++){
+    for(auto it=MCUSCK.begin();it!=MCUSCK.end();it++){
         if((*it).name==mcuName){
             
+            // This doesnt seem to work ngl
             u_long m=1;char tmp[1];
             ioctlsocket((*it).sck, FIONBIO, &m);
             int i = recv((*it).sck,tmp,sizeof(tmp),MSG_PEEK);
-            if(i==0){writeToLog("MCU Disconnected:", (*it).name.data());rmvSock((*it).sck);return "DC";}
+            if(i==0 || (i==SOCKET_ERROR && WSAGetLastError()!=WSAEWOULDBLOCK)){writeToLog("MCU Disconnected:", (*it).name.data());it=MCUSCK.erase(it);continue;}
             m=0;
             ioctlsocket((*it).sck, FIONBIO, &m);
 
             writeMCUMSGToLog(query);
-            if(send((*it).sck, query.c_str(), query.size(),0)==SOCKET_ERROR){writeToLog("Connection Error [MCU]",std::to_string(WSAGetLastError()).data());rmvSock((*it).sck);return "DC";}
+            if(send((*it).sck, query.c_str(), query.size(),0)==SOCKET_ERROR){writeToLog("Connection Error [MCU]",std::to_string(WSAGetLastError()).data());it=MCUSCK.erase(it);return "DC";}
             return readSocket((*it).sck);
         }
     }
