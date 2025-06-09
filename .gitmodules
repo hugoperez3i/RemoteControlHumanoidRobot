@@ -1,3 +1,7 @@
 [submodule "ServerSolution/Client/Java-Client"]
 	path = ServerSolution/Client/Java-Client
 	url = https://github.com/hugoperez3i/Robot-Control-Application
+	branch = main
+[submodule "ServerSolution/Client/UE5-ClientAPI"]
+	path = ServerSolution/Client/UE5-ClientAPI
+	url = https://github.com/hugoperez3i/Robot-Control-UE5Module
