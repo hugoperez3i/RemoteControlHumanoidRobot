@@ -7,12 +7,12 @@ QueryGenerator::~QueryGenerator(){
 }
 
 std::string QueryGenerator::ack(uint8_t code){
-    std::string q = "!s-_ACK:0-e!";
+    std::string q = "!s-_ACK-0-e!";
     q.replace(8,1,1,code);
     return q;
 }
 std::string QueryGenerator::nack(uint8_t code){
-    std::string q = "!s-NACK:0-e!";
+    std::string q = "!s-NACK-0-e!";
     q.replace(8,1,1,code);
     return q;
 }

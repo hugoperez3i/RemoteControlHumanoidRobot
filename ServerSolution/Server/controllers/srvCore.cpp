@@ -11,8 +11,25 @@ bool srvCore::srvUp;
 bool srvCore::loggerUp;
 std::vector<MCUSocket> srvCore::MCUSCK;
 std::vector<ControllerInfo> srvCore::ActiveControllers;
+volatile sig_atomic_t srvCore::sigCode;
+
 
 void srvCore::writeToLog(char* s){
+#ifdef LOGGER 
+    char timeBuffer[20]; 
+    auto now = std::chrono::system_clock::now();
+    auto t = std::chrono::system_clock::to_time_t(now);
+    auto milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()) % 1000;
+    std::strftime(timeBuffer, sizeof(timeBuffer), "%d/%m/%Y %H:%M:%S", std::localtime(&t));
+
+    std::string e = "\n["+std::string(timeBuffer)+"."+std::to_string(milliseconds.count())+"] "+s;
+
+    {std::lock_guard<std::mutex> lck(mtxLOG);
+        queueLOG.push(e);}
+    condLOG.notify_one();
+#endif
+}
+void srvCore::writeToLog(const char* s){
 #ifdef LOGGER 
     char timeBuffer[20]; 
     auto now = std::chrono::system_clock::now();
@@ -172,6 +189,7 @@ void srvCore::freeMCU(const char* n){
 
 srvCore::srvCore(char* ipAddress, int port){
     srvCore::srvUp=true;
+    sigCode=0;
     setupLogger();
     this->MCUSCK.reserve(2);this->ActiveControllers.reserve(2);
     if(WSAStartup(MAKEWORD(2, 2), &wsaData)!=NO_ERROR){WSACleanup();writeToLog("WSA_Error");srvCore::srvUp=false;return;}
@@ -180,8 +198,8 @@ srvCore::srvCore(char* ipAddress, int port){
     srvAddr.sin_family = AF_INET;
     srvAddr.sin_addr.s_addr = inet_addr(ipAddress);
     srvAddr.sin_port = htons(port);
-    if(bind(sckListen,(SOCKADDR *) &srvAddr,sizeof srvAddr) == SOCKET_ERROR){closesocket(sckListen);sckListen = INVALID_SOCKET;writeToLog("BindError:",std::to_string(WSAGetLastError()).data());WSACleanup();srvCore::srvUp=false;return;}
-    if(listen(sckListen,5)==SOCKET_ERROR){closesocket(sckListen);sckListen = INVALID_SOCKET;writeToLog("ListenError:",std::to_string(WSAGetLastError()).data());WSACleanup();srvCore::srvUp=false;return;}
+    if(bind(sckListen,(SOCKADDR *) &srvAddr,sizeof srvAddr) == SOCKET_ERROR){writeToLog("BindError:",std::to_string(WSAGetLastError()).data());closesocket(sckListen);sckListen = INVALID_SOCKET;WSACleanup();srvCore::srvUp=false;return;}
+    if(listen(sckListen,5)==SOCKET_ERROR){writeToLog("ListenError:",std::to_string(WSAGetLastError()).data());closesocket(sckListen);sckListen = INVALID_SOCKET;WSACleanup();srvCore::srvUp=false;return;}
         // Use backlog == SOMAXCONN for >>> client connections, else keep low (dont waste resources)
     FD_ZERO(&allSCK);
     FD_SET(sckListen,&allSCK);
@@ -293,7 +311,6 @@ std::string srvCore::contactMCU(const char* mcuName, std::string query){
     for(auto it=MCUSCK.begin();it!=MCUSCK.end();it++){
         if((*it).name==mcuName){
             
-            // This doesnt seem to work ngl
             u_long m=1;char tmp[1];
             ioctlsocket((*it).sck, FIONBIO, &m);
             int i = recv((*it).sck,tmp,sizeof(tmp),MSG_PEEK);
@@ -366,23 +383,29 @@ void srvCore::runServer(){
                 /* At least 1 sck is ready to accept/read */
                 
                 for (int i=0; i<rSCK.fd_count; i++){
-                    SOCKET sck = rSCK.fd_array[i];
-                    //Iterate through all the sockets ready to accept/read
 
-                    FD_CLR(sck,&rSCK);//Remove the sck being handled from the list 
-
-                    if(sck==sckListen){
-                        //Main socket - Accept new connection
-                        SOCKET s = accept(sckListen,NULL,NULL);
-                        if(s==INVALID_SOCKET){writeToLog("Accept Error");return;}
-                        cliHandler(s);
-                    }else{
-                        //Client Controller (AKA User) socket - Handle it
-                        userHandler(sck);
+                    try{
+                        SOCKET sck = rSCK.fd_array[i];
+                        //Iterate through all the sockets ready to accept/read
+    
+                        FD_CLR(sck,&rSCK);//Remove the sck being handled from the list 
+    
+                        if(sck==sckListen){
+                            //Main socket - Accept new connection
+                            SOCKET s = accept(sckListen,NULL,NULL);
+                            if(s==INVALID_SOCKET){writeToLog("Accept Error");return;}
+                            cliHandler(s);
+                        }else{
+                            //Client Controller (AKA User) socket - Handle it
+                            userHandler(sck);
+                        }
+                        
+                        if(rSCK.fd_count==0)break;
+                            //Check whether all rdy sockets were handled
+                    }catch(const std::exception& e){
+                        writeToLog(e.what());
                     }
-                    
-                    if(rSCK.fd_count==0)break;
-                        //Check whether all rdy sockets were handled
+
                 }
 
                 break;
@@ -390,5 +413,17 @@ void srvCore::runServer(){
 
     }
 
+    switch(sigCode) {
+        case 0: break; 
+        case SIGSEGV: writeToLog("FATAL ERROR: Segmentation fault."); break;
+        case SIGINT: writeToLog("User shut down: Interrupt signal."); break;
+        case SIGTERM: writeToLog("Termination signal."); break;
+        default: writeToLog("FATAL ERROR: Unknown signal received."); break;
+    }
+
 }
 
+void srvCore::signalHandler(int sig) {
+    srvCore::sigCode = static_cast<uint8_t>(sig);
+    srvCore::srvUp = false;
+}
