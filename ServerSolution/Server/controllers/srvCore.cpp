@@ -11,8 +11,25 @@ bool srvCore::srvUp;
 bool srvCore::loggerUp;
 std::vector<MCUSocket> srvCore::MCUSCK;
 std::vector<ControllerInfo> srvCore::ActiveControllers;
+volatile sig_atomic_t srvCore::sigCode;
+
 
 void srvCore::writeToLog(char* s){
+#ifdef LOGGER 
+    char timeBuffer[20]; 
+    auto now = std::chrono::system_clock::now();
+    auto t = std::chrono::system_clock::to_time_t(now);
+    auto milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()) % 1000;
+    std::strftime(timeBuffer, sizeof(timeBuffer), "%d/%m/%Y %H:%M:%S", std::localtime(&t));
+
+    std::string e = "\n["+std::string(timeBuffer)+"."+std::to_string(milliseconds.count())+"] "+s;
+
+    {std::lock_guard<std::mutex> lck(mtxLOG);
+        queueLOG.push(e);}
+    condLOG.notify_one();
+#endif
+}
+void srvCore::writeToLog(const char* s){
 #ifdef LOGGER 
     char timeBuffer[20]; 
     auto now = std::chrono::system_clock::now();
@@ -52,7 +69,7 @@ void srvCore::writeQueryToLog(char* s){
     std::string s1(s);std::string s2="";
     for(char c : s1){if(std::isprint((uint8_t)c)){s2+=c;} else {s2+=std::to_string((uint8_t)c);}}
 
-    std::string e = "\n["+std::string(timeBuffer)+"."+std::to_string(milliseconds.count())+"] New query -> "+s2;
+    std::string e = "\n["+std::string(timeBuffer)+"."+std::to_string(milliseconds.count())+"] Incoming query -> "+s2;
 
     {std::lock_guard<std::mutex> lck(mtxLOG);
         queueLOG.push(e);}
@@ -77,6 +94,24 @@ void srvCore::writeMCUMSGToLog(std::string s){
     condLOG.notify_one();
 #endif
 }
+void srvCore::writeCliMSGToLog(std::string s){
+    #ifdef LOGGER 
+        char timeBuffer[20]; 
+        auto now = std::chrono::system_clock::now();
+        auto t = std::chrono::system_clock::to_time_t(now);
+        auto milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()) % 1000;
+        std::strftime(timeBuffer, sizeof(timeBuffer), "%d/%m/%Y %H:%M:%S", std::localtime(&t));
+    
+        std::string s2="";
+        for(char c : s){if(std::isprint((uint8_t)c)){s2+=c;} else {s2+=std::to_string((uint8_t)c);}}
+    
+        std::string e = "\n["+std::string(timeBuffer)+"."+std::to_string(milliseconds.count())+"] Response to Client -> "+s2;
+    
+        {std::lock_guard<std::mutex> lck(mtxLOG);
+            queueLOG.push(e);}
+        condLOG.notify_one();
+    #endif
+    }
 void srvCore::writeDBERRToLog(char* s){
 #ifdef LOGGER 
     char timeBuffer[20]; 
@@ -127,14 +162,34 @@ void srvCore::setupDB(){
 }
 
 bool srvCore::isMCUOnline(const char* n){
-    for (auto it=MCUSCK.begin();it<MCUSCK.end();it++){
-        if(!(*it).name.compare(n)){return true;}
+    for (auto it=MCUSCK.begin();it!=MCUSCK.end();it++){
+        if(!(*it).name.compare(n)){
+            
+            // check for possible disconnects 
+            u_long m=1;char tmp[1];
+            ioctlsocket((*it).sck, FIONBIO, &m);
+            int i = recv((*it).sck,tmp,sizeof(tmp),MSG_PEEK);
+            if(i==0 || (i==SOCKET_ERROR && WSAGetLastError()!=WSAEWOULDBLOCK)){writeToLog("MCU Disconnected:", (*it).name.data());it=MCUSCK.erase(it)-1;continue;}
+            m=0;
+            ioctlsocket((*it).sck, FIONBIO, &m); 
+
+            return true;
+        }
     } 
     return false;
 }
 
+void srvCore::freeMCU(const char* n){
+    for (auto &&i : ActiveControllers){
+        if(!i.mcuInfo.mcuName.compare(n)){
+            i.mcuInfo=RobotInformation();
+        }
+    }
+}
+
 srvCore::srvCore(char* ipAddress, int port){
     srvCore::srvUp=true;
+    sigCode=0;
     setupLogger();
     this->MCUSCK.reserve(2);this->ActiveControllers.reserve(2);
     if(WSAStartup(MAKEWORD(2, 2), &wsaData)!=NO_ERROR){WSACleanup();writeToLog("WSA_Error");srvCore::srvUp=false;return;}
@@ -143,8 +198,8 @@ srvCore::srvCore(char* ipAddress, int port){
     srvAddr.sin_family = AF_INET;
     srvAddr.sin_addr.s_addr = inet_addr(ipAddress);
     srvAddr.sin_port = htons(port);
-    if(bind(sckListen,(SOCKADDR *) &srvAddr,sizeof srvAddr) == SOCKET_ERROR){closesocket(sckListen);sckListen = INVALID_SOCKET;writeToLog("BindError:",std::to_string(WSAGetLastError()).data());WSACleanup();srvCore::srvUp=false;return;}
-    if(listen(sckListen,5)==SOCKET_ERROR){closesocket(sckListen);sckListen = INVALID_SOCKET;writeToLog("ListenError:",std::to_string(WSAGetLastError()).data());WSACleanup();srvCore::srvUp=false;return;}
+    if(bind(sckListen,(SOCKADDR *) &srvAddr,sizeof srvAddr) == SOCKET_ERROR){writeToLog("BindError:",std::to_string(WSAGetLastError()).data());closesocket(sckListen);sckListen = INVALID_SOCKET;WSACleanup();srvCore::srvUp=false;return;}
+    if(listen(sckListen,5)==SOCKET_ERROR){writeToLog("ListenError:",std::to_string(WSAGetLastError()).data());closesocket(sckListen);sckListen = INVALID_SOCKET;WSACleanup();srvCore::srvUp=false;return;}
         // Use backlog == SOMAXCONN for >>> client connections, else keep low (dont waste resources)
     FD_ZERO(&allSCK);
     FD_SET(sckListen,&allSCK);
@@ -174,41 +229,55 @@ void srvCore::rmvSock(SOCKET s){
     closesocket(s);
 }
 void srvCore::rmvSockfromVectors(SOCKET s){
-    for (auto it=MCUSCK.begin();it<MCUSCK.end();it++){
+    for (auto it=MCUSCK.begin();it!=MCUSCK.end();it++){
         if((*it).sck==s){MCUSCK.erase(it); return;}
     }    
-    for (auto it=ActiveControllers.begin();it<ActiveControllers.end();it++){
-        if((*it).controllerSCK==s){
-            if(!(*it).mcuInfo.mcuName.empty()){DBMAN::saveMCUInfo((*it).mcuInfo);}
-            ActiveControllers.erase(it); 
-            return;
+    for (auto it=ActiveControllers.begin();it!=ActiveControllers.end();it++){
+        if((*it).controllerSCK==s){ActiveControllers.erase(it); return;
         }
     }        
 }
 
 void srvCore::mcuLogIn(RobotInformation info, SOCKET s){
-    MCUSCK.push_back(MCUSocket(s,info.mcuName));
+
+    // /* https://learn.microsoft.com/en-us/windows/win32/api/winsock/nf-winsock-setsockopt */ 
+    BOOL bOptVal = TRUE; 
+    setsockopt(s, SOL_SOCKET, SO_KEEPALIVE, (char *) &bOptVal, sizeof(bOptVal));
+    // /* https://learn.microsoft.com/en-us/windows/win32/winsock/sio-keepalive-vals */ 
+    struct tcp_keepalive ka;
+        ka.onoff = 1;
+        ka.keepalivetime = 1000;      
+        ka.keepaliveinterval = 1000;  
+    DWORD bytesReturned;
+    WSAIoctl(s, SIO_KEEPALIVE_VALS, &ka, sizeof(ka), nullptr, 0, &bytesReturned, nullptr, nullptr);
+
+    /* Check if self was connected (dc'd -> reconnect) and remove it */
+        // or throw an error if duplicate name
+    if(isMCUOnline(info.mcuName.data())){
+        writeToLog("Duplicate MCU connection attempt:",info.mcuName.data());
+        closesocket(s);
+        return;
+    }
+
     switch(DBMAN::registerMCU(info)){
         case _DBMAN_NEW_S_MCU:writeToLog("New smartMCU registered:",info.mcuName.data()); break;
         case _DBMAN_OLD_S_MCU:writeToLog("New smartMCU connected:",info.mcuName.data()); break;
         case _DBMAN_NEW_D_MCU:writeToLog("New dumbMCU registered:",info.mcuName.data()); break;
         case _DBMAN_OLD_D_MCU:writeToLog("New dumbMCU connected:",info.mcuName.data()); break;
         case _DBMAN_ERROR_INFMISSMATCH:
-            writeToLog("MCU Connection Error: Information Missmatch - MCU:",info.mcuName.data()); 
-            rmvSock(s);
-            writeToLog("Removed errored mcu connection - MCU:",info.mcuName.data()); 
-            break;
+            writeToLog("MCU Connection Error: Information Missmatch -> MCU:",info.mcuName.data()); 
+            writeToLog("Removed errored mcu connection -> MCU:",info.mcuName.data()); 
+            return;
         case _DBMAN_ERROR_REGMCU:
-            writeToLog("Unknown error during mcu login - MCU:",info.mcuName.data()); 
-            rmvSock(s);
-            writeToLog("Removed errored mcu connection - MCU:",info.mcuName.data()); 
-            break;
+            writeToLog("Unknown error during mcu login -> MCU:",info.mcuName.data()); 
+            writeToLog("Removed errored mcu connection -> MCU:",info.mcuName.data()); 
+            return;
         case _DBMAN_ERROR_REGSMCU:
-            writeToLog("Error while updating mcu info at login - MCU:",info.mcuName.data()); 
-            rmvSock(s);
-            writeToLog("Removed errored mcu connection - MCU:",info.mcuName.data()); 
-            break;
+            writeToLog("Error while updating mcu info at login -> MCU:",info.mcuName.data()); 
+            writeToLog("Removed errored mcu connection -> MCU:",info.mcuName.data()); 
+            return;
     }
+    MCUSCK.push_back(MCUSocket(s,info.mcuName));
 }
 
 void srvCore::usrLogIn(SOCKET s){
@@ -237,20 +306,20 @@ std::string srvCore::readSocket(SOCKET s){
     return str;
 }
 
-/* (N)ACK from MCU or -> "DC" if the Socket closes the connection or "E404" if mcuName cannot be found */
+/* (N)ACK from MCU or "E404" if mcuName cannot be found */
 std::string srvCore::contactMCU(const char* mcuName, std::string query){
-    for(auto it=MCUSCK.begin();it<MCUSCK.end();it++){
+    for(auto it=MCUSCK.begin();it!=MCUSCK.end();it++){
         if((*it).name==mcuName){
             
             u_long m=1;char tmp[1];
             ioctlsocket((*it).sck, FIONBIO, &m);
             int i = recv((*it).sck,tmp,sizeof(tmp),MSG_PEEK);
-            if(i==0){writeToLog("MCU Disconnected:", (*it).name.data());rmvSock((*it).sck);return "DC";}
+            if(i==0 || (i==SOCKET_ERROR && WSAGetLastError()!=WSAEWOULDBLOCK)){writeToLog("MCU Disconnected:", (*it).name.data());it=MCUSCK.erase(it);continue;}
             m=0;
             ioctlsocket((*it).sck, FIONBIO, &m);
 
             writeMCUMSGToLog(query);
-            if(send((*it).sck, query.c_str(), query.size(),0)==SOCKET_ERROR){writeToLog("Connection Error [MCU]",std::to_string(WSAGetLastError()).data());rmvSock((*it).sck);return "DC";}
+            if(send((*it).sck, query.c_str(), query.size(),0)==SOCKET_ERROR){writeToLog("Connection Error [MCU]",std::to_string(WSAGetLastError()).data());it=MCUSCK.erase(it);return "DC";}
             return readSocket((*it).sck);
         }
     }
@@ -314,23 +383,29 @@ void srvCore::runServer(){
                 /* At least 1 sck is ready to accept/read */
                 
                 for (int i=0; i<rSCK.fd_count; i++){
-                    SOCKET sck = rSCK.fd_array[i];
-                    //Iterate through all the sockets ready to accept/read
 
-                    FD_CLR(sck,&rSCK);//Remove the sck being handled from the list 
-
-                    if(sck==sckListen){
-                        //Main socket - Accept new connection
-                        SOCKET s = accept(sckListen,NULL,NULL);
-                        if(s==INVALID_SOCKET){writeToLog("Accept Error");return;}
-                        cliHandler(s);
-                    }else{
-                        //Client Controller (AKA User) socket - Handle it
-                        userHandler(sck);
+                    try{
+                        SOCKET sck = rSCK.fd_array[i];
+                        //Iterate through all the sockets ready to accept/read
+    
+                        FD_CLR(sck,&rSCK);//Remove the sck being handled from the list 
+    
+                        if(sck==sckListen){
+                            //Main socket - Accept new connection
+                            SOCKET s = accept(sckListen,NULL,NULL);
+                            if(s==INVALID_SOCKET){writeToLog("Accept Error");return;}
+                            cliHandler(s);
+                        }else{
+                            //Client Controller (AKA User) socket - Handle it
+                            userHandler(sck);
+                        }
+                        
+                        if(rSCK.fd_count==0)break;
+                            //Check whether all rdy sockets were handled
+                    }catch(const std::exception& e){
+                        writeToLog(e.what());
                     }
-                    
-                    if(rSCK.fd_count==0)break;
-                        //Check whether all rdy sockets were handled
+
                 }
 
                 break;
@@ -338,5 +413,17 @@ void srvCore::runServer(){
 
     }
 
+    switch(sigCode) {
+        case 0: break; 
+        case SIGSEGV: writeToLog("FATAL ERROR: Segmentation fault."); break;
+        case SIGINT: writeToLog("User shut down: Interrupt signal."); break;
+        case SIGTERM: writeToLog("Termination signal."); break;
+        default: writeToLog("FATAL ERROR: Unknown signal received."); break;
+    }
+
 }
 
+void srvCore::signalHandler(int sig) {
+    srvCore::sigCode = static_cast<uint8_t>(sig);
+    srvCore::srvUp = false;
+}

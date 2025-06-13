@@ -55,10 +55,8 @@ void loop() {
 		fb.setBool("FlagNewInfo",false);
   
     }
-	
-	if(fb.getBool("FlagMoveServo")){ 
-
-		cc=fb.getInt("ServoUpdateFlag"); 
+  if(cc!=0){
+  if(fb.getBool("FlagMoveServo")){ 
 
         for (i=0; i < 27; i++){ 
             if((cc & (0b1<<i))==(0b1<<i)){
@@ -79,6 +77,7 @@ void loop() {
         cc=0;
 
 	}
+}
     delay(1000);
 
 }
