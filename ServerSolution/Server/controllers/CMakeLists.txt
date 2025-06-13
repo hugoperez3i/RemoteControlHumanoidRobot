@@ -1,7 +1,6 @@
 cmake_minimum_required(VERSION 3.10)
 project(ControlServer)
 
-
 add_library(ControllersLib
     queryGenerator.cpp
     serverLogic.cpp

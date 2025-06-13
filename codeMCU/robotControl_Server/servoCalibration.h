@@ -114,4 +114,4 @@ const uint8_t restingServoPos[]={0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 // forearmRotationL - 0 / armFlexL - 2 / bicepsRotationL - 4 / shoulderArmRotationL - 6 / shoulderTorsoRotationL - 8
 // forearmRotationR - 1 / armFlexR - 3 / bicepsRotationR - 5 / shoulderArmRotationR - 7 / shoulderTorsoRotationR - 9
 // torsoTiltL - 10 / torsoTiltR - 11
-// headTiltL - 13 / headTiltR - 14 / headRotation - 15
+// headTiltL - 12 / headTiltR - 13 / headRotation - 14

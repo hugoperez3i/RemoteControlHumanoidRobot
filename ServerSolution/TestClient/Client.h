@@ -55,5 +55,6 @@ class Client{
         int executeMovements();
         int shutdownServer();
         int uploadMINMAXinf(std::vector<std::vector<uint16_t>>);
+        int readServerResponse();
 };
 

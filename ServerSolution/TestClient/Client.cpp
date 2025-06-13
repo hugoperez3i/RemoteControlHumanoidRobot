@@ -82,6 +82,18 @@ int Client::moveServos(uint32_t flag,std::vector<int> aV){
     return _CLI_ok;
 }
 
+int Client::readServerResponse(){
+    const char* rq = this->sck.rcv();
+
+    if(strncmp(&rq[3],"_ACK",4)){
+        if(!strncmp(&rq[3],"NACK",4)){
+            return rq[8];
+        }
+        return _CLI_NVALIDRESPONSE;
+    }
+    return _CLI_ok;
+}
+
 int Client::setDelayedMode(bool t){
     std::string q="!s-eMOD-0-e!";
     if(t){q.replace(8,1,1,_eMOD_Delayed);}else{q.replace(8,1,1,_eMOD_RealTime);}

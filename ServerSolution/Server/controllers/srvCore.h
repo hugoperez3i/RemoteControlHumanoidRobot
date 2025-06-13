@@ -6,8 +6,8 @@
 
 #define LOGGER /* Comment this line to disable logging */
 
-#include <windows.h>
 #include <winsock2.h>
+#include <windows.h>
 #include <ws2tcpip.h>
 #include <iostream>
 #include <mutex>
@@ -60,6 +60,7 @@ class srvCore{
         static std::string readSocket(SOCKET);
         static void rmvSockfromVectors(SOCKET);
         static void writeToLog(char*);
+        static void writeToLog(const char*);
         static void writeQueryToLog(char*);
         static void writeMCUMSGToLog(std::string);
         static void writeToLog(char*,char*);
@@ -67,13 +68,16 @@ class srvCore{
         static void setupLogger();
         static void logfn();
     public:
+        static volatile sig_atomic_t sigCode;
         static bool srvUp;
         srvCore(char*, int);
         ~srvCore();
         void runServer();
         static void writeDBERRToLog(char*);
+        static void writeCliMSGToLog(std::string); 
         static bool isMCUOnline(const char*);
         static void rmvSock(SOCKET);
         static std::string contactMCU(const char*,std::string query);
-
+        static void freeMCU(const char*);
+        static void signalHandler(int sig);
 };
