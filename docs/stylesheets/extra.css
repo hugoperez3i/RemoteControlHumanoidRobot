@@ -1,0 +1,10 @@
+.md-typeset h1 {
+    font-family: "Calisto MT";
+}
+[data-md-color-accent="deep-orange"] {
+  --md-accent-fg-color:              hsla(17, 28%, 55%, 1);   /* mocca'ish */
+  --md-accent-fg-color--transparent: hsla(17, 28%, 55%, 0.1);
+
+  --md-accent-bg-color:              hsla(0, 0%, 100%, 1);
+  --md-accent-bg-color--light:       hsla(0, 0%, 100%, 0.7);
+}

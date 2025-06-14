@@ -242,7 +242,9 @@ void srvCore::mcuLogIn(RobotInformation info, SOCKET s){
 
     // /* https://learn.microsoft.com/en-us/windows/win32/api/winsock/nf-winsock-setsockopt */ 
     BOOL bOptVal = TRUE; 
-    setsockopt(s, SOL_SOCKET, SO_KEEPALIVE, (char *) &bOptVal, sizeof(bOptVal));
+    setsockopt(s, SOL_SOCKET, SO_KEEPALIVE, (char*) &bOptVal, sizeof(bOptVal));
+    // /* https://learn.microsoft.com/en-us/windows/win32/winsock/ipproto-tcp-socket-options */
+    setsockopt(s, IPPROTO_TCP, TCP_NODELAY, (char*) &bOptVal, sizeof(bOptVal));
     // /* https://learn.microsoft.com/en-us/windows/win32/winsock/sio-keepalive-vals */ 
     struct tcp_keepalive ka;
         ka.onoff = 1;
