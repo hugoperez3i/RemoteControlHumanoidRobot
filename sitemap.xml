@@ -2,54 +2,54 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
          <loc>http://127.0.0.1:8000/</loc>
-         <lastmod>2025-06-13</lastmod>
+         <lastmod>2025-06-14</lastmod>
     </url>
     <url>
          <loc>http://127.0.0.1:8000/Application%20Protocol/Application%20Protocol/</loc>
-         <lastmod>2025-06-13</lastmod>
+         <lastmod>2025-06-14</lastmod>
     </url>
     <url>
          <loc>http://127.0.0.1:8000/Application%20Protocol/Control%20Query/</loc>
-         <lastmod>2025-06-13</lastmod>
+         <lastmod>2025-06-14</lastmod>
     </url>
     <url>
          <loc>http://127.0.0.1:8000/Application%20Protocol/Execution%20Mode/</loc>
-         <lastmod>2025-06-13</lastmod>
+         <lastmod>2025-06-14</lastmod>
     </url>
     <url>
          <loc>http://127.0.0.1:8000/Application%20Protocol/Identification%20Query/</loc>
-         <lastmod>2025-06-13</lastmod>
+         <lastmod>2025-06-14</lastmod>
     </url>
     <url>
          <loc>http://127.0.0.1:8000/Application%20Protocol/MCU%20Information/</loc>
-         <lastmod>2025-06-13</lastmod>
+         <lastmod>2025-06-14</lastmod>
     </url>
     <url>
          <loc>http://127.0.0.1:8000/Application%20Protocol/Robot%20Selection/</loc>
-         <lastmod>2025-06-13</lastmod>
+         <lastmod>2025-06-14</lastmod>
     </url>
     <url>
          <loc>http://127.0.0.1:8000/Application%20Protocol/Server%20Shutdown/</loc>
-         <lastmod>2025-06-13</lastmod>
+         <lastmod>2025-06-14</lastmod>
     </url>
     <url>
          <loc>http://127.0.0.1:8000/Application%20Protocol/Servo%20Movement/</loc>
-         <lastmod>2025-06-13</lastmod>
+         <lastmod>2025-06-14</lastmod>
     </url>
     <url>
          <loc>http://127.0.0.1:8000/Application%20Protocol/Upload%20Information/</loc>
-         <lastmod>2025-06-13</lastmod>
+         <lastmod>2025-06-14</lastmod>
     </url>
     <url>
          <loc>http://127.0.0.1:8000/demos/Demo%20Showcase/</loc>
-         <lastmod>2025-06-13</lastmod>
+         <lastmod>2025-06-14</lastmod>
     </url>
     <url>
          <loc>http://127.0.0.1:8000/demos/Platform%20Showcase/</loc>
-         <lastmod>2025-06-13</lastmod>
+         <lastmod>2025-06-14</lastmod>
     </url>
     <url>
          <loc>http://127.0.0.1:8000/demos/UE5%20Module%20Showcase/</loc>
-         <lastmod>2025-06-13</lastmod>
+         <lastmod>2025-06-14</lastmod>
     </url>
 </urlset>
