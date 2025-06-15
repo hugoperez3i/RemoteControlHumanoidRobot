@@ -8,11 +8,11 @@
       
       
       
-        <link rel="canonical" href="http://127.0.0.1:8000/">
+        <link rel="canonical" href="https://hugoperez3i.github.io/RemoteControlHumanoidRobot/">
       
       
       
-        <link rel="next" href="Application%20Protocol/Application%20Protocol/">
+        <link rel="next" href="demos/Demo%20Showcase/">
       
       
       <link rel="icon" href="assets/Logo.png">
@@ -20,7 +20,7 @@
     
     
       
-        <title>Telerobotic Platform: Remote control of a humanoid robot</title>
+        <title>Index - Telerobotic Platform: Remote control of a humanoid robot</title>
       
     
     
@@ -102,7 +102,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Home
+              Index
             
           </span>
         </div>
@@ -202,33 +202,14 @@
     
   
   
-    <li class="md-tabs__item md-tabs__item--active">
-      <a href="." class="md-tabs__link">
-        
-  
-  
-    
-  
-  Home
-
-      </a>
-    </li>
-  
-
-      
-        
-  
-  
-  
-  
     
     
-      <li class="md-tabs__item">
-        <a href="Application%20Protocol/Application%20Protocol/" class="md-tabs__link">
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="." class="md-tabs__link">
           
   
   
-  Application Protocol
+  Home
 
         </a>
       </li>
@@ -248,7 +229,7 @@
           
   
   
-  Demos
+  Demo
 
         </a>
       </li>
@@ -300,6 +281,54 @@
   
   
   
+    
+    
+    
+    
+      
+        
+        
+      
+      
+    
+    
+      
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_1" id="__nav_1_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    Home
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_1_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_1">
+            <span class="md-nav__icon md-icon"></span>
+            Home
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
     <li class="md-nav__item md-nav__item--active">
       
       <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
@@ -311,7 +340,7 @@
   
   
   <span class="md-ellipsis">
-    Home
+    Index
     
   </span>
   
@@ -321,48 +350,10 @@
     </li>
   
 
-    
-      
-      
-  
-  
-  
-  
-    
-    
-    
-    
-      
-      
-    
-    
-      
-        
-        
-      
-    
-    <li class="md-nav__item md-nav__item--pruned md-nav__item--nested">
-      
-        
-  
-  
-  
-    <a href="Application%20Protocol/Application%20Protocol/" class="md-nav__link">
-      
-  
-  
-  <span class="md-ellipsis">
-    Application Protocol
-    
-  </span>
-  
-
-      
-        <span class="md-nav__icon md-icon"></span>
-      
-    </a>
-  
-
+              
+            
+          </ul>
+        </nav>
       
     </li>
   
@@ -398,7 +389,7 @@
   
   
   <span class="md-ellipsis">
-    Demos
+    Demo
     
   </span>
   
@@ -436,20 +427,32 @@
   <a href="https://github.com/hugoperez3i/RemoteControlHumanoidRobot">
     <img src="assets/Logo.svg" style="width: 100px; height: 100px;">
   </a>
+  <h1 style="margin: 0; font-size: 2.5rem; font-weight: 700;">
+    Telerobotic Platform:
+  </h1>
   <h1>
-    Telerobotic Platform:<br>
     Remote Control of a Humanoid Robot
   </h1>
 </div>
 
-<p>blahblah Telerobotic platform, orchestrator model, remote operation of robots with up to 32 servos. </p>
-<p>educational purpose</p>
-<p>the platform features a custom lightweight comms protocol focused in functionality and readability</p>
-<p>It also incorporates a fully developed JavaFX client application, as well as a UE5 module ...</p>
-<p>This proyect represents the combination of both my Telecommunications Systems Engineering and Biomedical Engineering bachelor's thesis. </p>
-<p>blahblah platform description</p>
-<p>blahblah developed client options</p>
-<p>https://squidfunk.github.io/mkdocs-material/reference/images/#image-alignment-left</p>
+<p>This project features an educational telerobotic platform designed for the remote operation of robots. It follows an orchestrator system architecture in which a central server receives commands from remote clients and routes them to the selected robot. </p>
+<figure>
+  <img alt="Platform Architecture" src="assets/Architecture.png" width="800" />
+<br />
+<figcaption/>
+
+
+</figure>
+<p>Communications between nodes are handled through a custom, lightweight, application-layer protocol focused on clarity and functionality, minimizing overhead while remaining human-readable and easily extendable.</p>
+<p>The platform includes two client-side implementations. The first one is a fully developed JavaFX application, offering a streamlined graphical interface for direct robot control. The second is a custom Unreal Engine 5 module that seamlessly integrates into UE5 projects using a blueprint-friendly interface, enabling real-time robotic control from within Unreal-based projects.</p>
+<p>To sum it up:</p>
+<ul>
+<li>Orchestrator-based platform</li>
+<li>Lightweight, human-readable custom protocol</li>
+<li>JavaFX GUI Client</li>
+<li>UE5 Control module with native Blueprint integration</li>
+</ul>
+<p>This project merges the work of both my Telecommunications Systems Engineering and Biomedical Engineering bachelor’s theses, combining system-level communications design with applied robotics in a single, complete platform.</p>
 
 
 

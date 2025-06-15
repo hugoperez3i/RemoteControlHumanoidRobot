@@ -8,7 +8,7 @@
       
       
       
-        <link rel="canonical" href="https://hugoperez3i.github.io/RemoteControlHumanoidRobot/Application%20Protocol/Control%20Query/">
+        <link rel="canonical" href="https://hugoperez3i.github.io/RemoteControlHumanoidRobot/Application%20Protocol/Protocol%20Definition/">
       
       
       
@@ -18,7 +18,7 @@
     
     
       
-        <title>Control Query - Telerobotic Platform: Remote control of a humanoid robot</title>
+        <title>Protocol Definition - Telerobotic Platform: Remote control of a humanoid robot</title>
       
     
     
@@ -71,6 +71,11 @@
     <label class="md-overlay" for="__drawer"></label>
     <div data-md-component="skip">
       
+        
+        <a href="#architecture-components" class="md-skip">
+          Skip to content
+        </a>
+      
     </div>
     <div data-md-component="announce">
       
@@ -100,7 +105,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Control Query
+              Protocol Definition
             
           </span>
         </div>
@@ -375,9 +380,58 @@
 
 
 
-  <h1>Control Query</h1>
+  <h1>Protocol Definition</h1>
 
-<p>_ACK / NACK</p>
+<p>blahblah protocol</p>
+<div class="language-text highlight"><pre><span></span><code>Persistent socket connection through TCP/IP
+plain raw binary - no codification
+port 54817
+</code></pre></div>
+<h2 id="architecture-components">Architecture Components</h2>
+<p>The protocol contemplates three types of nodes: <em>client</em>, <em>server</em> and <em>mcu</em>.</p>
+<ul>
+<li><strong>Client:</strong> Refers to the remote user, which can control a <em>mcu</em>.</li>
+<li><strong>Server:</strong> Refers to the orchestrator service, in charge of query validation and routing <em>client</em> queries to the indicated <em>MCU</em>. </li>
+<li><strong>MCU:</strong> Refers to the remote robotic system, which may be remotely operated by a <em>client</em>.</li>
+</ul>
+<h3 id="client-role">Client Role</h3>
+<div class="language-text highlight"><pre><span></span><code>heh TODO
+</code></pre></div>
+<h3 id="server-role">Server Role</h3>
+<div class="language-text highlight"><pre><span></span><code>heh TODO
+</code></pre></div>
+<h3 id="mcu-role">MCU Role</h3>
+<div class="language-text highlight"><pre><span></span><code>heh TODO
+</code></pre></div>
+<h2 id="mcu-types">MCU Types</h2>
+<p>The protocol contemplates two types of <em>MCU</em> robotic systems:</p>
+<ul>
+<li><strong>SmartMCU:</strong> Refers to a <em>mcu</em> that is capable of generating its own PWM signal values for a given position. This means that a <em>SmartMCU</em> must be able to store locally the PWM calibration values, it also needs to be capable of storing <em>pending movements</em>, and will be required to, on connection, send the current position of each of its servos.</li>
+<li><strong>DumbMCU:</strong> Refers to a <em>mcu</em> that executes movements by reading the PWM signal value directly from the query. This means that a <em>DumbMCU</em> will not receive any information until a movement is expected to be executed, at which point, it will receive a query with the <strong>PWM signal value</strong> for each servo, instead of a servo position (0º-179º). On connection, a <em>DumbMCU</em> is required to send the number of servos it has. </li>
+</ul>
+<h2 id="no-binary-zero-convention">No binary zero convention</h2>
+<p>In order to avoid potential issues with the zero-value bytes (<code class="language-Cpp highlight"><span class="kt">uint8_t</span><span class="w"> </span><span class="n">b</span><span class="o">=</span><span class="mi">0</span></code>), <strong>every numerical field that could possibly take the value zero gets offset by +1</strong>. This means that fields such as <code>servoId</code> (range 0-31) and <code>servoPosition</code> (range 0-179) will be sent with a +1 possitive offset applied: <code>servoId</code> would take the range (1-32) and <code>servoPosition</code> the range (1-180).</p>
+<h2 id="protocol-query-format">Protocol Query Format</h2>
+<p>The protocol distiguishes two types of query formats: A <em>client - server</em> format, and a <em>server - mcu</em> format. These two formats were defined to improve the clarity of the protocol, making it obvious which part of the communication chain a given query belongs to.
+However, the <a href="../Identification%20Query/">login query</a> poses an exception to these formats, where <em>client</em> and <em>mcu</em> have a unique query style, also different from the other query formats.</p>
+<p>All characters used for query formatting, be it query structur</p>
+<h3 id="client-server-query-format"><em>Client - Server</em> Query Format</h3>
+<p>The message follows a set structure: it always starts with a constant header, <code>!s-</code>, followed by a 4-byte function selector code <code>CODE</code>, and is terminated by a constant tail <code>-e!</code>. This structure can accomodate aditional information, for those functions that require it: the information will be addded behind the four-byte function selector code (<code>CODE</code>), separated with an additional slash <code>-</code>.</p>
+<div class="tabbed-set tabbed-alternate" data-tabs="1:2"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">No additional information</label><label for="__tabbed_1_2">Containing additional information</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>!s-CODE-e!
+</span></code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="language-text highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>!s-CODE-&lt;additional_information&gt;-e!
+</span></code></pre></div>
+</div>
+</div>
+</div>
+<p>This means that the minimum query length will be <code>11</code> bytes (3 from the header <code>!s-</code>, +4 from the selection code <code>CODE</code>, and +3 from the tail sequence <code>-e!</code>). Any query with less than <code>11 bytes</code> can be safely deleted, as it would mean that some kind of error happened during query formation.</p>
+<h3 id="server-mcu-query-format"><em>Server - MCU</em> Query Format</h3>
+<p>Similarly to the <em>client - server</em> query, the <em>server - mcu</em> query also uses an structured format with header and tail. However, in this second format, the header is reduced to a single <code>-</code>, while the tail sequence takes the form <code>-!</code>. The 4-byte function selector code becomes a single-byte code <code>c</code>, and the additional information, when needed, is added in the exact same format as the <em>client - server</em> format: behind the single-byte code <code>c</code>, and separated with a dash character <code>-</code>.</p>
 
 
 
