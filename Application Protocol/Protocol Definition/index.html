@@ -312,19 +312,15 @@
       
     
     
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
-      
-    
-    <li class="md-nav__item md-nav__item--pruned md-nav__item--nested">
-      
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1" >
         
-  
-  
-  
-    <a href="../.." class="md-nav__link">
-      
+          
+          <label class="md-nav__link" for="__nav_1" id="__nav_1_label" tabindex="0">
+            
   
   
   <span class="md-ellipsis">
@@ -333,12 +329,41 @@
   </span>
   
 
-      
-        <span class="md-nav__icon md-icon"></span>
-      
-    </a>
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1">
+            <span class="md-nav__icon md-icon"></span>
+            Home
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Index
+    
+  </span>
   
 
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
       
     </li>
   
@@ -362,8 +387,6 @@
       
       
     
-    
-      
     
     <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
       
@@ -567,19 +590,15 @@
       
     
     
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
-      
-    
-    <li class="md-nav__item md-nav__item--pruned md-nav__item--nested">
-      
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
         
-  
-  
-  
-    <a href="../../demos/Demo%20Showcase/" class="md-nav__link">
-      
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
   
   
   <span class="md-ellipsis">
@@ -588,12 +607,87 @@
   </span>
   
 
-      
-        <span class="md-nav__icon md-icon"></span>
-      
-    </a>
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            Demo
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../demos/Demo%20Showcase/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Demo Showcase: Scripted actions
+    
+  </span>
   
 
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../demos/Platform%20Showcase/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Full Platform Showcase
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../demos/UE5%20Module%20Showcase/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    UE5 Module Showcase: RemoteClientSystem
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
       
     </li>
   
@@ -617,7 +711,8 @@
 
   <h1>Protocol Definition</h1>
 
-<p>The application protocol runs over a persistent socket connection through the TCP/IP stack. Since it relies on TCP for several of its core behaviors, it's recommended - but not required - to disable <a href="https://en.wikipedia.org/wiki/Nagle%27s_algorithm">Nagle's Algorithm</a> by enabling the TCP_NODELAY socket option, and to enable the <a href="https://tldp.org/HOWTO/TCP-Keepalive-HOWTO/overview.html">TCP keepalive</a> with an aggressive setting. By default, the protocol uses port <code>TCP:54817</code>.</p>
+<hr />
+<p>The application protocol runs over a persistent socket connection through the TCP/IP stack. Since it relies on TCP for several of its core behaviors, it's recommended, but not required, to disable <a href="https://en.wikipedia.org/wiki/Nagle%27s_algorithm">Nagle's Algorithm</a> by enabling the TCP_NODELAY socket option; and to enable the <a href="https://tldp.org/HOWTO/TCP-Keepalive-HOWTO/overview.html">TCP keepalive</a> with an aggressive setting. By default, the protocol uses port <code>TCP:54817</code>.</p>
 <h2 id="architecture-components">Architecture Components</h2>
 <p>The protocol contemplates three types of nodes: <em>client</em>, <em>server</em> and <em>mcu</em>.</p>
 <ul>
@@ -742,7 +837,7 @@ However, the <a href="../Identification%20Query/">login query</a> poses an excep
     
     
       
-      <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.instant", "navigation.tabs", "toc.follow", "toc.integrate", "navigation.prune", "navigation.top"], "search": "../../assets/javascripts/workers/search.d50fe291.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+      <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.instant", "navigation.tabs", "toc.follow", "toc.integrate", "navigation.top"], "search": "../../assets/javascripts/workers/search.d50fe291.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
       <script src="../../assets/javascripts/bundle.13a4f30d.min.js"></script>

@@ -310,19 +310,15 @@
       
     
     
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
-      
-    
-    <li class="md-nav__item md-nav__item--pruned md-nav__item--nested">
-      
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1" >
         
-  
-  
-  
-    <a href="../.." class="md-nav__link">
-      
+          
+          <label class="md-nav__link" for="__nav_1" id="__nav_1_label" tabindex="0">
+            
   
   
   <span class="md-ellipsis">
@@ -331,12 +327,41 @@
   </span>
   
 
-      
-        <span class="md-nav__icon md-icon"></span>
-      
-    </a>
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1">
+            <span class="md-nav__icon md-icon"></span>
+            Home
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Index
+    
+  </span>
   
 
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
       
     </li>
   
@@ -356,19 +381,15 @@
       
     
     
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
-      
-    
-    <li class="md-nav__item md-nav__item--pruned md-nav__item--nested">
-      
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
         
-  
-  
-  
-    <a href="../../Application%20Protocol/Protocol%20Definition/" class="md-nav__link">
-      
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
   
   
   <span class="md-ellipsis">
@@ -377,12 +398,41 @@
   </span>
   
 
-      
-        <span class="md-nav__icon md-icon"></span>
-      
-    </a>
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            Application Protocol
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../Application%20Protocol/Protocol%20Definition/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Protocol Definition
+    
+  </span>
   
 
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
       
     </li>
   
@@ -406,8 +456,6 @@
       
       
     
-    
-      
     
     <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
       
@@ -616,11 +664,11 @@
 <p>This demo intends to show the RemoteClientSystem (RCS) module developed to incorporate this platform's controls into the Unreal Engine 5 ecosystem. </p>
 <hr />
 <h2 id="function-suite">Function Suite</h2>
-<p>The RCS module abstracts the platform communication protocols into a set of Blueprint-friendly functions that make possible integration of the platform robot interface into Unreal's scripting system.</p>
+<p>The RCS module abstracts away the platform communication protocols into a set of Blueprint-friendly functions that make possible integration of the robotic platform interface into Unreal's scripting system.</p>
 <p><img alt="UE5 Blueprint with RCS functions" src="../../assets/RCS%20Functions.png" /></p>
 <hr />
 <h2 id="support-data-structures">Support Data Structures</h2>
-<p>In order to increase the compatibility and make the usage of the RCS module on the Blueprint system, it incorporates the <code class="language-Cpp highlight"><span class="k">struct</span><span class="w"> </span><span class="nc">FServoInfo</span></code>, which combines the <code class="language-Cpp highlight"><span class="n">uint8</span><span class="w"> </span><span class="n">servoId</span></code> and <code class="language-Cpp highlight"><span class="n">uint8</span><span class="w"> </span><span class="n">servoPosition</span></code> information into a simple, Blueprint compatible data structure.</p>
+<p>In order to increase the compatibility and make the usage of the RCS module possible on the Blueprint system, it incorporates the <code class="language-Cpp highlight"><span class="k">struct</span><span class="w"> </span><span class="nc">FServoInfo</span></code>, which combines the <code class="language-Cpp highlight"><span class="n">uint8</span><span class="w"> </span><span class="n">servoId</span></code> and <code class="language-Cpp highlight"><span class="n">uint8</span><span class="w"> </span><span class="n">servoPosition</span></code> information into a simple, Blueprint compatible data structure.</p>
 <p><img alt="UE5 Blueprint with RCS FServoInfo struct" src="../../assets/RCS%20FServoInfo.png" /></p>
 <p>RCS also incorporates <code class="language-Cpp highlight"><span class="k">enum</span><span class="w"> </span><span class="nc">ECLIErrorCode</span></code>, an enum listing the possible error codes returned by this module's functions. This code can be retrieved using the <code class="language-cpp highlight"><span class="n">GetErr</span><span class="p">()</span></code> Blueprint function, and filtered against an enum switch, simplifying error handling on UE Blueprints.</p>
 <figure>
@@ -711,7 +759,7 @@
     
     
       
-      <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.instant", "navigation.tabs", "toc.follow", "toc.integrate", "navigation.prune", "navigation.top"], "search": "../../assets/javascripts/workers/search.d50fe291.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+      <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.instant", "navigation.tabs", "toc.follow", "toc.integrate", "navigation.top"], "search": "../../assets/javascripts/workers/search.d50fe291.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
       <script src="../../assets/javascripts/bundle.13a4f30d.min.js"></script>
