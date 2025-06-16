@@ -27,9 +27,11 @@ int main(int argc, char const *argv[]){
 
     c.snd(str.data());
     char* q;
+    std::string ack = "!s-_ACK-c-e!";
+        ack.replace(8,1,1,255);
     while(true){
         q=c.rcv();
-        c.snd("ACK");
+        c.snd(ack.data());
     }
 
 }

@@ -6,7 +6,7 @@ This demo intends to show the RemoteClientSystem (RCS) module developed to incor
 
 ## Function Suite
 
-The RCS module abstracts the platform communication protocols into a set of Blueprint-friendly functions that make possible integration of the platform robot interface into Unreal's scripting system.
+The RCS module abstracts away the platform communication protocols into a set of Blueprint-friendly functions that make possible integration of the robotic platform interface into Unreal's scripting system.
 
 ![UE5 Blueprint with RCS functions](../assets/RCS%20Functions.png)
 
@@ -14,7 +14,7 @@ The RCS module abstracts the platform communication protocols into a set of Blue
 
 ## Support Data Structures
 
-In order to increase the compatibility and make the usage of the RCS module on the Blueprint system, it incorporates the `#!Cpp struct FServoInfo`, which combines the `#!Cpp uint8 servoId` and `#!Cpp uint8 servoPosition` information into a simple, Blueprint compatible data structure.
+In order to increase the compatibility and make the usage of the RCS module possible on the Blueprint system, it incorporates the `#!Cpp struct FServoInfo`, which combines the `#!Cpp uint8 servoId` and `#!Cpp uint8 servoPosition` information into a simple, Blueprint compatible data structure.
 
 ![UE5 Blueprint with RCS FServoInfo struct](../assets/RCS%20FServoInfo.png)
 

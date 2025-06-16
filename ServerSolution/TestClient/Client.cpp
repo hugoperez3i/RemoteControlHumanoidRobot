@@ -1,7 +1,7 @@
 #include "Client.h"
 
 Client::Client(const char* i)
-    :sck(CliSock(i, 57573)){
+    :sck(CliSock(i, 54817)){
         sck.snd("!s-Client_here-e!");
     }
 

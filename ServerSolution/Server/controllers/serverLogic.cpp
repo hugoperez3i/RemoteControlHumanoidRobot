@@ -1,6 +1,30 @@
 #include "serverLogic.h"
 #include <cstring>
 
+class ClientConnection{
+    /* Dead man swich so client socket connections are force-closed on thread crash / unexpected exit before final return */
+    private:
+        SOCKET sck;
+
+    public:
+        
+        explicit ClientConnection(SOCKET s):sck(s){}
+        ~ClientConnection(){
+            if(sck!=INVALID_SOCKET){
+                srvCore::rmvSock(sck);
+            }
+        }
+
+        ClientConnection(const ClientConnection&) = delete;
+        ClientConnection& operator=(const ClientConnection&) = delete;
+        ClientConnection(ClientConnection&&) = delete;
+        ClientConnection& operator=(ClientConnection&&) = delete;
+
+        void releaseSocket(){
+            sck=INVALID_SOCKET; 
+        }
+};
+
 inline bool checkHeader(std::string query){
     return (query.length()>=(TAILLEN+HEADERLEN+CODELEN) ? (query.compare(0,HEADERLEN,HEADERTXT)==0 && query.compare(query.length()-TAILLEN,TAILLEN,TAILTXT)==0) : false);
 }
@@ -75,7 +99,7 @@ std::string serverLogic::dispatchSRVP(char* bquery,ControllerInfo* c){
         }    
     }
 
-    if(strcmp(&rq[0],"ACK")){return QueryGenerator().nack(_NACK_ErrorContactingMCU);}
+    if(rq.find("_ACK")==std::string::npos){return QueryGenerator().nack(_NACK_ErrorContactingMCU);}
 
     if((*c).updateOnRealTime){
         for(size_t i = 0; i < (*c).mcuInfo.servoCount; i++){
@@ -108,7 +132,8 @@ std::string serverLogic::dispatchMALL(ControllerInfo* c){
         if((*c).mcuInfo.updateFlag==0){return QueryGenerator().nack(_NACK_InvalidParameter);}
         query=srvCore::contactMCU((*c).mcuInfo.mcuName.c_str(),QueryGenerator().dmb_mvServo((*c).mcuInfo.updateFlag,(*c).mcuInfo.targetPositions,(*c).mcuInfo.servos_MIN_MAX));
     }
-    if(strcmp(&query[0],"ACK")){return QueryGenerator().nack(_NACK_ErrorContactingMCU);}
+
+    if(query.find("_ACK")==std::string::npos){return QueryGenerator().nack(_NACK_ErrorContactingMCU);}
 
         for(size_t i = 0; i < (*c).mcuInfo.servoCount; i++){
             if((((*c).mcuInfo.updateFlag & (0b1<<i)))==(0b1<<i)){
@@ -213,7 +238,7 @@ RobotInformation serverLogic::getQueryInformation(std::string q){
     if(tmp.at(i+3)==(char)187){return RobotInformation(mcuName,tmp.at(i+1),false);}
 
     std::vector<uint8_t> positions;
-    if(tmp.at(i+1)>31){throw std::invalid_argument("Malformed query string.");}
+    if(tmp.at(i+1)>32){throw std::invalid_argument("Malformed query string.");}
     positions.reserve(tmp.at(i+1));    
     if(tmp.size()<(i+3+(2*tmp.at(i+1)-1))){throw std::invalid_argument("Malformed query string.");} // Check bounds
     for (size_t j = 0; j < tmp.at(i+1); j++){
@@ -226,6 +251,9 @@ RobotInformation serverLogic::getQueryInformation(std::string q){
 void serverLogic::handleQuery(std::string q, ControllerInfo* c){
 
     std::string qr = QueryGenerator().nack(_NACK_InvalidQuery);
+
+    ClientConnection cc((*c).controllerSCK); /* Set deadman switch for client socket */
+
     if(checkHeader(q) && checkNulls(q)){
 
         char* code = new char[5];
@@ -267,6 +295,9 @@ void serverLogic::handleQuery(std::string q, ControllerInfo* c){
     }
     
     send((*c).controllerSCK,qr.c_str(),qr.size(), 0);
+
+    cc.releaseSocket(); /* Release deadman switch before thread natural end */
+
     srvCore::writeCliMSGToLog(qr);
     return;
 }

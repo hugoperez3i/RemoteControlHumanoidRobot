@@ -4,7 +4,7 @@ A simple showcase of the telerobotic platform working, in which the Youbionic Ha
 
 ## Showcase Video 
 <div align="center">
-<video width="480" height="480" controls>
+<video width="480" height="480" controls muted>
     <source src="../../assets/demoMovs.mp4" type="video/mp4">
 </video>
 </div>
@@ -12,7 +12,7 @@ A simple showcase of the telerobotic platform working, in which the Youbionic Ha
 
 ## Demo walkthrough
 
-This demo intends to show how the platform operates. For this task a simple client is used to control the Youbionic Half robot, and perform a series of scripted movements that resemble the action of looking towards your hand, open and close it, and get back to your original position.
+This demo intends to show how the platform operates. For this task, a simple client is used to control the Youbionic Half robot, and perform a series of scripted movements that resemble the action of looking towards your hand, opening and closing it, and then get back to your original position.
 
 ### Server Connection
 

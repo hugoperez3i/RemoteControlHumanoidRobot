@@ -8,7 +8,7 @@
 #endif
 
 #ifndef SERVER_PORT
-    #define SERVER_PORT 57573
+    #define SERVER_PORT 54817
 #endif
 
 int main(int argc, char const *argv[]){

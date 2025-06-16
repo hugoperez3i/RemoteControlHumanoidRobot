@@ -1,7 +1,30 @@
 site_name: "Telerobotic Platform: Remote control of a humanoid robot"
 
-site_url: http://127.0.0.1:8000/
-# site_url: https://hugoperez3i.github.io/RemoteControlHumanoidRobot/
+# site_url: http://127.0.0.1:8000/
+site_url: https://hugoperez3i.github.io/RemoteControlHumanoidRobot/
+
+nav:
+  - Home:
+    - index.md
+  # - Application Protocol: 
+  #   - Application Protocol/Protocol Definition.md
+  #   - Application Protocol/Control Query.md
+  #   - Application Protocol/Identification Query.md
+  #   - Application Protocol/Robot Selection.md
+  #   - Application Protocol/Servo Movement.md
+  #   - Application Protocol/MCU Information.md
+  #   - Application Protocol/Execution Mode.md
+  #   - Application Protocol/Upload Information.md
+  #   - Application Protocol/Server Shutdown.md
+  # # - UE5 Module:
+  #   - 
+  - Demo: 
+    - demos/Demo Showcase.md
+    - demos/Platform Showcase.md
+    - demos/UE5 Module Showcase.md
+  # - License:
+  #   - License/License.md
+
 theme:
   name: material
   logo: assets/Logo.png

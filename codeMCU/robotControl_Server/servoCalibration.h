@@ -125,7 +125,7 @@ const uint8_t restingServoPos[]={90,90,90,90,90,0, // left hand
                                   170,60, // arm flex
                                   110,70, // arm rotation
                                   150,150, // shoulder flex
-                                  0,179, // circonduction
+                                  0,80, // circonduction
                                   100,95, // torso tilt
                                   56,126, // head tilt
                                   100}; // head rot
