@@ -711,14 +711,14 @@
 <hr />
 <h2 id="function-suite">Function Suite</h2>
 <p>The RCS module abstracts away the platform communication protocols into a set of Blueprint-friendly functions that make possible integration of the robotic platform interface into Unreal's scripting system.</p>
-<p><img alt="UE5 Blueprint with RCS functions" src="../../assets/RCS%20Functions.png" /></p>
+<p><img alt="UE5 Blueprint with RCS functions" src="/RemoteControlHumanoidRobot/assets/RCS%20Functions.png" /></p>
 <hr />
 <h2 id="support-data-structures">Support Data Structures</h2>
 <p>In order to increase the compatibility and make the usage of the RCS module possible on the Blueprint system, it incorporates the <code class="language-Cpp highlight"><span class="k">struct</span><span class="w"> </span><span class="nc">FServoInfo</span></code>, which combines the <code class="language-Cpp highlight"><span class="n">uint8</span><span class="w"> </span><span class="n">servoId</span></code> and <code class="language-Cpp highlight"><span class="n">uint8</span><span class="w"> </span><span class="n">servoPosition</span></code> information into a simple, Blueprint compatible data structure.</p>
-<p><img alt="UE5 Blueprint with RCS FServoInfo struct" src="../../assets/RCS%20FServoInfo.png" /></p>
+<p><img alt="UE5 Blueprint with RCS FServoInfo struct" src="/RemoteControlHumanoidRobot/assets/RCS%20FServoInfo.png" /></p>
 <p>RCS also incorporates <code class="language-Cpp highlight"><span class="k">enum</span><span class="w"> </span><span class="nc">ECLIErrorCode</span></code>, an enum listing the possible error codes returned by this module's functions. This code can be retrieved using the <code class="language-cpp highlight"><span class="n">GetErr</span><span class="p">()</span></code> Blueprint function, and filtered against an enum switch, simplifying error handling on UE Blueprints.</p>
 <figure>
-    <img align="center" alt="UE5 Blueprint with RCS ECLIErrorCode enum" src="../../assets/RCS%20ECLIErrorCode.png" />
+    <img align="center" alt="UE5 Blueprint with RCS ECLIErrorCode enum" src="/RemoteControlHumanoidRobot/assets/RCS%20ECLIErrorCode.png" />
     <figcaption/>
 </figure>
 <hr />
@@ -726,7 +726,7 @@
 <p>A brief video showcasing how the UE5 RemoteClientSystem can be used to operate the Youbionic Robot, in this case performing head rotation on each movement order.</p>
 <div align="center">
 <video width="400"  controls muted> 
-    <source src="../assets/demoUE5.mp4" type="video/mp4">
+    <source src="/RemoteControlHumanoidRobot/assets/demoUE5.mp4" type="video/mp4">
 </video>
 </div>
 
