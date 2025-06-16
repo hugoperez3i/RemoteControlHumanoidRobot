@@ -11,6 +11,10 @@
         <link rel="canonical" href="https://hugoperez3i.github.io/RemoteControlHumanoidRobot/Application%20Protocol/Identification%20Query/">
       
       
+        <link rel="prev" href="../Control%20Query/">
+      
+      
+        <link rel="next" href="../../demos/Demo%20Showcase/">
       
       
       <link rel="icon" href="../../assets/Logo.png">
@@ -70,6 +74,11 @@
     <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
     <label class="md-overlay" for="__drawer"></label>
     <div data-md-component="skip">
+      
+        
+        <a href="#client-login-query" class="md-skip">
+          Skip to content
+        </a>
       
     </div>
     <div data-md-component="announce">
@@ -217,10 +226,12 @@
   
   
   
+    
+  
   
     
     
-      <li class="md-tabs__item">
+      <li class="md-tabs__item md-tabs__item--active">
         <a href="../Protocol%20Definition/" class="md-tabs__link">
           
   
@@ -362,24 +373,29 @@
       
   
   
+    
   
   
+  
     
     
     
     
-      
-      
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
         
           
-          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
             
   
   
@@ -392,7 +408,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_2">
             <span class="md-nav__icon md-icon"></span>
             Application Protocol
@@ -417,6 +433,108 @@
   
 
       </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Control%20Query/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Control Query
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    Identification Query
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    Identification Query
+    
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#client-login-query" class="md-nav__link">
+    <span class="md-ellipsis">
+      Client Login Query
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#mcu-login-query" class="md-nav__link">
+    <span class="md-ellipsis">
+      MCU Login Query
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -565,8 +683,50 @@
   <h1>Identification Query</h1>
 
 <hr />
-<p>client_here
-NodeMCU_here</p>
+<p>The login or identification query informs the <em>server</em> of the type of node initiating the connection, whether it's a <em>client</em> or an <em>mcu</em>.</p>
+<p>This query poses an exception from the <code>4-byte code</code> structure, though it still follows the overall query structure. Instead of using said code, it relies on two constant sequences <code>Client_here</code> and <code>NodeMCU_here</code>, which represent the <em>client</em> node and <em>mcu</em> nodes respectively.</p>
+<p>This query has a different behaviour depending on whether it was successful or not. When it succeeds, the server <strong>will send no reponse</strong> and, on failure, the <em>server</em> will reply with a <a href="../Control%20Query/">control query</a> containing an error code identifying the error. 
+The possible error codes that may be returned by the server are:</p>
+<ul>
+<li><em><code>_NACK_InvalidQuery</code></em> (<code class="language-Cpp highlight"><span class="kt">uint8_t</span><span class="w"> </span><span class="n">c</span><span class="o">=</span><span class="mi">255</span></code>) → If the query format is invalid: contains null-bytes, invalid header or tail sequences, or the query does not follow the structure for the <em>client</em> or <em>mcu</em> login queries.</li>
+</ul>
+<hr />
+<h2 id="client-login-query">Client Login Query</h2>
+<p>The client login query is very straightfoward: The <em>client</em> sends the login query and, assuming there's no unexpected/unknown errors on server-side, the <em>client</em> will be logged to the <em>server</em> successfully. Otherwise, a <a href="../Control%20Query/">negative control query</a> will be returned, and the connection will be closed.</p>
+<p>The login query is a constant sequence of characters with the form: <code>!s-Client_here-e!</code>.</p>
+<figure>
+  <img alt="Client login comm schema" src="../../assets/cliLogin.png#only-light" />
+  <img alt="Client login comm schema" src="../../assets/cliLogin_w.png#only-dark" />
+<br />
+<figcaption>Diagram for a successful and failed client login query</figcaption>
+</figure>
+<hr />
+<h2 id="mcu-login-query">MCU Login Query</h2>
+<p>On the other hand, the mcu login query is a little bit more complex. The query will follow a structure similar to the <em>client</em> one, using the constant sequence <code>!s-NodeMCU_here-[info]-e!</code> but with an additional information field, <code>[info]</code>, added to the message. This additional field will contain information about the <em>mcu</em>, such as the <strong>unique id</strong> or name, used to identify the <em>mcu</em>; the <strong>number of servos</strong>, which indicates how many servos the <em>mcu</em> has; and either a fixed byte value (<code class="language-Cpp highlight"><span class="kt">uint8_t</span><span class="w"> </span><span class="n">c</span><span class="o">=</span><span class="mi">187</span></code>), if the <em>mcu</em> is of the type <a href="../Protocol%20Definition/#mcu-role">DumbMCU</a>; or the current position of each of the <em>mcu</em> servos, if the <em>mcu</em> is of the type <a href="../Protocol%20Definition/#mcu-role">SmartMCU</a>.</p>
+<div class="tabbed-set tabbed-alternate" data-tabs="1:2"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">DumbMCU Login Query</label><label for="__tabbed_1_2">SmartMCU Login Query</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>!s-NodeMCU_here-[MCU_UNIQUE_NAME]-[SERVO_COUNT]-[187]-e!
+</span></code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="language-text highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>!s-NodeMCU_here-[MCU_UNIQUE_NAME]-[SERVO_COUNT]-[SERVOPOS(0)]-&lt;...&gt;-[SERVOPOS(SERVO_COUNT-1)]-e!
+</span></code></pre></div>
+</div>
+</div>
+</div>
+<ul>
+<li><em><code>[MCU_UNIQUE_NAME]</code></em> → The unique id used to identify the <em>mcu</em>.</li>
+<li><em><code>[SERVO_COUNT]</code></em> → A single <code class="language-Cpp highlight"><span class="kt">uint8_t</span></code> indicating how many servos the <em>mcu</em> has. Since this number cannot be zero, it does not need any offset applied.</li>
+<li><em><code>[187]</code></em> → The byte <code class="language-Cpp highlight"><span class="kt">uint8_t</span><span class="w"> </span><span class="n">b</span><span class="o">=</span><span class="mi">187</span></code>. Indicates the server that the <em>mcu</em> is of the type <strong>DumbMCU</strong>.</li>
+<li><em><code>[SERVOPOS(i)]</code></em> → The position of each mcu servo, with a dash <code>-</code> between each of them, and ordered by ascending servo ID. Since this value can be zero (0-179 range), <a href="../Protocol%20Definition/#no-binary-zero-convention">by protocol it needs to be offset by +1</a></li>
+</ul>
+<figure>
+  <img alt="Client login comm schema" src="../../assets/mcuLogin.png#only-light" />
+  <img alt="Client login comm schema" src="../../assets/mcuLogin_w.png#only-dark" />
+<br />
+<figcaption>Diagram for a successful and failed mcu login query</figcaption>
+</figure>
 
 
 

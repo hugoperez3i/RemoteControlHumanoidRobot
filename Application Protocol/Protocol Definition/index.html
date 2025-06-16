@@ -14,7 +14,7 @@
         <link rel="prev" href="../..">
       
       
-        <link rel="next" href="../../demos/Demo%20Showcase/">
+        <link rel="next" href="../Control%20Query/">
       
       
       <link rel="icon" href="../../assets/Logo.png">
@@ -569,6 +569,52 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Control%20Query/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Control Query
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Identification%20Query/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Identification Query
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -721,11 +767,11 @@
 <li><strong>MCU:</strong> Refers to the remote robotic system, which may be remotely operated by a <em>client</em>.</li>
 </ul>
 <h3 id="client-role">Client Role</h3>
-<p>The <em>client</em> is the only proactive node in the architecture: it sends commands to the <em>server</em>, which either relays them to the <em>mcu</em> or handles them directly before replying with a control response.</p>
+<p>The <em>client</em> is the only proactive node in the architecture: it sends commands to the <em>server</em>, which either relays them to the <em>mcu</em> or handles them directly before replying with a <a href="../Control%20Query/">control response</a>.</p>
 <h3 id="server-role">Server Role</h3>
 <p>The <em>server</em> acts as the orchestrator in this architecture. Its functions are routing and validation, interconnecting each <em>client</em> with the <em>mcu</em> it intends to control, and validating the parameters sent by the <em>client</em> before relaying them to the <em>mcu</em> for execution. The <em>server</em> will never send any message to the <em>client</em> or <em>mcu</em> unless prompted by a <em>client</em> query.</p>
 <h3 id="mcu-role">MCU Role</h3>
-<p>The <em>mcu</em> is the passive executor node, responsible solely for carrying out orders received from the <em>server</em>. On startup, it sends a login message to the <em>server</em>, then waits for incoming commands, executes them, and replies with an ACK control message.</p>
+<p>The <em>mcu</em> is the passive executor node, responsible solely for carrying out orders received from the <em>server</em>. On startup, it sends a <a href="../Identification%20Query/">login message</a> to the <em>server</em>, then waits for incoming commands, executes them, and replies with an ACK control message.</p>
 <h2 id="mcu-types">MCU Types</h2>
 <p>The protocol contemplates two types of <em>MCU</em> robotic systems:</p>
 <ul>
@@ -747,7 +793,7 @@ However, the <a href="../Identification%20Query/">login query</a> poses an excep
 </span></code></pre></div>
 </div>
 <div class="tabbed-block">
-<div class="language-text highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>!s-CODE-&lt;additional_information&gt;-e!
+<div class="language-text highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>!s-CODE-[ADDITIONAL_INFORMATION]-e!  
 </span></code></pre></div>
 </div>
 </div>
@@ -762,7 +808,7 @@ However, the <a href="../Identification%20Query/">login query</a> poses an excep
 </span></code></pre></div>
 </div>
 <div class="tabbed-block">
-<div class="language-text highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>-c-&lt;additional_information&gt;-!
+<div class="language-text highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>-c-[ADDITIONAL_INFORMATION]-!
 </span></code></pre></div>
 </div>
 </div>

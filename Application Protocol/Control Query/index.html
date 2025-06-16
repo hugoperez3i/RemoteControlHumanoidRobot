@@ -11,6 +11,10 @@
         <link rel="canonical" href="https://hugoperez3i.github.io/RemoteControlHumanoidRobot/Application%20Protocol/Control%20Query/">
       
       
+        <link rel="prev" href="../Protocol%20Definition/">
+      
+      
+        <link rel="next" href="../Identification%20Query/">
       
       
       <link rel="icon" href="../../assets/Logo.png">
@@ -217,10 +221,12 @@
   
   
   
+    
+  
   
     
     
-      <li class="md-tabs__item">
+      <li class="md-tabs__item md-tabs__item--active">
         <a href="../Protocol%20Definition/" class="md-tabs__link">
           
   
@@ -362,24 +368,29 @@
       
   
   
+    
   
   
+  
     
     
     
     
-      
-      
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
         
           
-          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
             
   
   
@@ -392,7 +403,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_2">
             <span class="md-nav__icon md-icon"></span>
             Application Protocol
@@ -412,6 +423,60 @@
   
   <span class="md-ellipsis">
     Protocol Definition
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    Control Query
+    
+  </span>
+  
+
+      </a>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Identification%20Query/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Identification Query
     
   </span>
   
@@ -565,7 +630,8 @@
   <h1>Control Query</h1>
 
 <hr />
-<p>The positive (ACK) and negative (NACK) control queries serve as a way of</p>
+<p>The positive (ACK) and negative (NACK) control queries let the client know whether a requested action was successful or not. In case of failure, NACKs also provide context on what went wrong or where the error occurred.</p>
+<p>These queries follow the standard protocol structure, using <code>_ACK</code> and <code>NACK</code> as their 4-byte function codes. They include a single byte <code>c</code> as the error code (for positive control queries, <code>c</code> will take always the value <code class="language-cpp highlight"><span class="kt">uint8_t</span><span class="w"> </span><span class="n">c</span><span class="o">=</span><span class="mi">255</span></code>)..</p>
 <div class="tabbed-set tabbed-alternate" data-tabs="1:2"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">Positive (Acknowledge) Query</label><label for="__tabbed_1_2">Negative (No Acknowledge) Query</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block">
@@ -578,6 +644,15 @@
 </div>
 </div>
 </div>
+<p>As such, the communication schema in which these queries will be used will look like the one illustrated on the following diagram.</p>
+<figure>
+  <img alt="Control query comm schema" src="../../assets/cntrlQuery.png#only-light" />
+  <img alt="Control query comm schema" src="../../assets/cntrlQuery_w.png#only-dark" />
+<br />
+<figcaption/>
+
+
+</figure>
 
 
 
