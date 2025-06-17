@@ -708,19 +708,23 @@ The possible error codes that may be returned by the server are:</p>
 <div class="tabbed-block">
 <div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>!s-NodeMCU_here-[MCU_UNIQUE_NAME]-[SERVO_COUNT]-[187]-e!
 </span></code></pre></div>
-</div>
-<div class="tabbed-block">
-<div class="language-text highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>!s-NodeMCU_here-[MCU_UNIQUE_NAME]-[SERVO_COUNT]-[SERVOPOS(0)]-&lt;...&gt;-[SERVOPOS(SERVO_COUNT-1)]-e!
-</span></code></pre></div>
-</div>
-</div>
-</div>
 <ul>
 <li><em><code>[MCU_UNIQUE_NAME]</code></em> → The unique id used to identify the <em>mcu</em>.</li>
 <li><em><code>[SERVO_COUNT]</code></em> → A single <code class="language-Cpp highlight"><span class="kt">uint8_t</span></code> indicating how many servos the <em>mcu</em> has. Since this number cannot be zero, it does not need any offset applied.</li>
 <li><em><code>[187]</code></em> → The byte <code class="language-Cpp highlight"><span class="kt">uint8_t</span><span class="w"> </span><span class="n">b</span><span class="o">=</span><span class="mi">187</span></code>. Indicates the server that the <em>mcu</em> is of the type <strong>DumbMCU</strong>.</li>
+</ul>
+</div>
+<div class="tabbed-block">
+<div class="language-text highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>!s-NodeMCU_here-[MCU_UNIQUE_NAME]-[SERVO_COUNT]-[SERVOPOS(0)]-&lt;...&gt;-[SERVOPOS(SERVO_COUNT-1)]-e!
+</span></code></pre></div>
+<ul>
+<li><em><code>[MCU_UNIQUE_NAME]</code></em> → The unique id used to identify the <em>mcu</em>.</li>
+<li><em><code>[SERVO_COUNT]</code></em> → A single <code class="language-Cpp highlight"><span class="kt">uint8_t</span></code> indicating how many servos the <em>mcu</em> has. Since this number cannot be zero, it does not need any offset applied.</li>
 <li><em><code>[SERVOPOS(i)]</code></em> → The position of each mcu servo, with a dash <code>-</code> between each of them, and ordered by ascending servo ID. Since this value can be zero (0-179 range), <a href="../Protocol%20Definition/#no-binary-zero-convention">by protocol it needs to be offset by +1</a></li>
 </ul>
+</div>
+</div>
+</div>
 <figure>
   <img alt="Client login comm schema" src="../../assets/mcuLogin.png#only-light" />
   <img alt="Client login comm schema" src="../../assets/mcuLogin_w.png#only-dark" />
