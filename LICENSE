@@ -19,29 +19,3 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-
-
----
-
-**Third-Party Libraries and Dependencies**
-
-This project incorporates third-party libraries and images which are licensed under their respective terms. 
-The licenses for these libraries and images remain unchanged and must be adhered to when using or distributing this project. 
-
-The third-party libraries used in this project include:
-
-1. **SQLite** - Public domain. (https://sqlite.org/copyright.html)
-2. **Unreal Engine 5.5** - Licensed under the Unreal® Engine End User License Agreement. (https://www.unrealengine.com/en-US/eula/unreal)
-3. **Java (JDK21)** - Licensed under the GNU General Public License, version 2, with the Classpath Exception. (https://openjdk.org/legal/gplv2+ce.html)   
-4. **JavaFX** - Licensed under the GNU General Public License v2.0. (https://github.com/openjdk/jfx/blob/master/LICENSE)
-
-Third-party icons sourced from https://game-icons.net/ (CC BY 3.0):  
-
-- Artists: Lorc, sbed, Lord Berandas, Delapouite, et al.
-- License: https://creativecommons.org/licenses/by/3.0/  
-
----
-
-## Trademark Notice
-
-"Unreal Engine" is a trademark of Epic Games, Inc. This project is not affiliated with or endorsed by Epic Games.
