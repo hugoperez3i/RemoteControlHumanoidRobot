@@ -11,6 +11,10 @@
         <link rel="canonical" href="https://hugoperez3i.github.io/RemoteControlHumanoidRobot/Application%20Protocol/Server%20Shutdown/">
       
       
+        <link rel="prev" href="../Servo%20Movement/">
+      
+      
+        <link rel="next" href="../../demos/Demo%20Showcase/">
       
       
       <link rel="icon" href="../../assets/Logo.png">
@@ -217,10 +221,12 @@
   
   
   
+    
+  
   
     
     
-      <li class="md-tabs__item">
+      <li class="md-tabs__item md-tabs__item--active">
         <a href="../Protocol%20Definition/" class="md-tabs__link">
           
   
@@ -362,24 +368,29 @@
       
   
   
+    
   
   
+  
     
     
     
     
-      
-      
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
         
           
-          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
             
   
   
@@ -392,7 +403,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_2">
             <span class="md-nav__icon md-icon"></span>
             Application Protocol
@@ -457,12 +468,89 @@
   
   
   <span class="md-ellipsis">
-    Identification Query
+    Login Query
     
   </span>
   
 
       </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Robot%20Selection/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    MCU Selection
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Servo%20Movement/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Servo Movement
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    Server Shutdown
+    
+  </span>
+  
+
+      </a>
+      
     </li>
   
 
@@ -611,10 +699,19 @@
   <h1>Server Shutdown</h1>
 
 <hr />
-<p>The server shutdown query ...</p>
+<p>The server shutdown message's only purpose is to remotely disconnect and shut down the server. It uses the fixed format:</p>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>!s-sOFF-e!
 </span></code></pre></div>
-<p>As such, the communication schema for this query type will look like the one illustrated on the following diagram.</p>
+<p>If successful, the server replies with an ACK control query. If it fails, mostly due to invalid format or a similar issue, it will return with a NACK: <em><code>_NACK_InvalidQuery</code></em> (<code class="language-Cpp highlight"><span class="kt">uint8_t</span><span class="w"> </span><span class="n">c</span><span class="o">=</span><span class="mi">255</span></code>).
+As such, the communication schema for this query will look like the one illustrated on the following diagram.</p>
+<figure>
+  <img alt="Server OFF comm schema" src="../../assets/shutdown.png#only-light" width="600" />
+  <img alt="Server OFF comm schema" src="../../assets/shutdown_w.png#only-dark" width="600" />
+<br />
+<figcaption/>
+
+
+</figure>
 
 
 

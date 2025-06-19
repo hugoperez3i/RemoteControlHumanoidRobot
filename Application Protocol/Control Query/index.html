@@ -476,7 +476,76 @@
   
   
   <span class="md-ellipsis">
-    Identification Query
+    Login Query
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Robot%20Selection/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    MCU Selection
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Servo%20Movement/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Servo Movement
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Server%20Shutdown/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Server Shutdown
     
   </span>
   
@@ -631,7 +700,7 @@
 
 <hr />
 <p>The positive (ACK) and negative (NACK) control queries let the client know whether a requested action was successful or not. In case of failure, NACKs also provide context on what went wrong or where the error occurred.</p>
-<p>These queries follow the standard protocol structure, using <code>_ACK</code> and <code>NACK</code> as their 4-byte function codes. They include a single byte <code>c</code> as the error code (for positive control queries, <code>c</code> will take always the value <code class="language-cpp highlight"><span class="kt">uint8_t</span><span class="w"> </span><span class="n">c</span><span class="o">=</span><span class="mi">255</span></code>)..</p>
+<p>These queries follow the standard protocol structure, using <code>_ACK</code> and <code>NACK</code> as their 4-byte function codes. They include a single byte <code>c</code> as the error code (for positive control queries, <code>c</code> will take always the value <code class="language-cpp highlight"><span class="kt">uint8_t</span><span class="w"> </span><span class="n">c</span><span class="o">=</span><span class="mi">255</span></code>).</p>
 <div class="tabbed-set tabbed-alternate" data-tabs="1:2"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">Positive (Acknowledge) Query</label><label for="__tabbed_1_2">Negative (No Acknowledge) Query</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block">

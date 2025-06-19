@@ -14,7 +14,7 @@
         <link rel="prev" href="../Control%20Query/">
       
       
-        <link rel="next" href="../../demos/Demo%20Showcase/">
+        <link rel="next" href="../Robot%20Selection/">
       
       
       <link rel="icon" href="../../assets/Logo.png">
@@ -22,7 +22,7 @@
     
     
       
-        <title>Identification Query - Telerobotic Platform: Remote control of a humanoid robot</title>
+        <title>Login Query - Telerobotic Platform: Remote control of a humanoid robot</title>
       
     
     
@@ -76,7 +76,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#client-login-query" class="md-skip">
+        <a href="#login-query" class="md-skip">
           Skip to content
         </a>
       
@@ -109,7 +109,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Identification Query
+              Login Query
             
           </span>
         </div>
@@ -474,13 +474,15 @@
       <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
       
       
+        
+      
       
         <label class="md-nav__link md-nav__link--active" for="__toc">
           
   
   
   <span class="md-ellipsis">
-    Identification Query
+    Login Query
     
   </span>
   
@@ -493,7 +495,7 @@
   
   
   <span class="md-ellipsis">
-    Identification Query
+    Login Query
     
   </span>
   
@@ -505,6 +507,8 @@
 <nav class="md-nav md-nav--secondary" aria-label="Table of contents">
   
   
+  
+    
   
   
     <label class="md-nav__title" for="__toc">
@@ -535,6 +539,75 @@
   
 </nav>
       
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Robot%20Selection/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    MCU Selection
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Servo%20Movement/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Servo Movement
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Server%20Shutdown/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Server Shutdown
+    
+  </span>
+  
+
+      </a>
     </li>
   
 
@@ -680,15 +753,14 @@
 
 
 
-  <h1>Identification Query</h1>
-
+<h1 id="login-query">Login Query</h1>
 <hr />
 <p>The login or identification query informs the <em>server</em> of the type of node initiating the connection, whether it's a <em>client</em> or an <em>mcu</em>.</p>
 <p>This query poses an exception from the <code>4-byte code</code> structure, though it still follows the overall query structure. Instead of using said code, it relies on two constant sequences <code>Client_here</code> and <code>NodeMCU_here</code>, which represent the <em>client</em> node and <em>mcu</em> nodes respectively.</p>
 <p>This query has a different behaviour depending on whether it was successful or not. When it succeeds, the server <strong>will send no reponse</strong> and, on failure, the <em>server</em> will reply with a <a href="../Control%20Query/">control query</a> containing an error code identifying the error. 
 The possible error codes that may be returned by the server are:</p>
 <ul>
-<li><em><code>_NACK_InvalidQuery</code></em> (<code class="language-Cpp highlight"><span class="kt">uint8_t</span><span class="w"> </span><span class="n">c</span><span class="o">=</span><span class="mi">255</span></code>) → If the query format is invalid: contains null-bytes, invalid header or tail sequences, or the query does not follow the structure for the <em>client</em> or <em>mcu</em> login queries.</li>
+<li><em><code>_NACK_InvalidQuery</code></em> (<code class="language-Cpp highlight"><span class="kt">uint8_t</span><span class="w"> </span><span class="n">c</span><span class="o">=</span><span class="mi">255</span></code>) → If the <a href="../Protocol%20Definition/#client-server-query-format">query format</a> is invalid: contains null-bytes, invalid header or tail sequences, or the query does not follow the structure for the <em>client</em> or <em>mcu</em> login queries.</li>
 </ul>
 <hr />
 <h2 id="client-login-query">Client Login Query</h2>
