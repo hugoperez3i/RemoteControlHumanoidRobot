@@ -867,7 +867,7 @@ The possible error codes that may be returned by the server are:</p>
 <hr />
 <h2 id="mcu-login-query">MCU Login Query</h2>
 <p>On the other hand, the mcu login query is a little bit more complex. The query will follow a structure similar to the <em>client</em> one, using the constant sequence <code>!s-NodeMCU_here-[info]-e!</code> but with an additional information field, <code>[info]</code>, added to the message. This additional field will contain information about the <em>mcu</em>, such as the <strong>unique id</strong> or name, used to identify the <em>mcu</em>; the <strong>number of servos</strong>, which indicates how many servos the <em>mcu</em> has; and either a fixed byte value (<code class="language-Cpp highlight"><span class="kt">uint8_t</span><span class="w"> </span><span class="n">c</span><span class="o">=</span><span class="mi">187</span></code>), if the <em>mcu</em> is of the type <a href="../Protocol%20Definition/#mcu-role">DumbMCU</a>; or the current position of each of the <em>mcu</em> servos, if the <em>mcu</em> is of the type <a href="../Protocol%20Definition/#mcu-role">SmartMCU</a>.</p>
-<div class="tabbed-set tabbed-alternate" data-tabs="1:2"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">SmartMCU Login Query</label><label for="__tabbed_1_2">DumbMCU Login Query</label></div>
+<div class="tabbed-set tabbed-alternate" data-tabs="1:2"><input checked="checked" id="smartmcu-login-query" name="__tabbed_1" type="radio" /><input id="dumbmcu-login-query" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="smartmcu-login-query">SmartMCU Login Query</label><label for="dumbmcu-login-query">DumbMCU Login Query</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block">
 <div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>!s-NodeMCU_here-[MCU_UNIQUE_NAME]-[SERVO_COUNT]-[SERVOPOS(0)]-&lt;...&gt;-[SERVOPOS(SERVO_COUNT-1)]-e!
@@ -912,6 +912,8 @@ The possible error codes that may be returned by the server are:</p>
             </div>
           
           
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
 <script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
         </div>
         
@@ -964,7 +966,7 @@ The possible error codes that may be returned by the server are:</p>
     
     
       
-      <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.instant", "navigation.tabs", "toc.follow", "toc.integrate", "navigation.top"], "search": "../../assets/javascripts/workers/search.d50fe291.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+      <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.instant", "navigation.tabs", "content.tabs.link", "toc.follow", "toc.integrate", "navigation.top"], "search": "../../assets/javascripts/workers/search.d50fe291.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
       <script src="../../assets/javascripts/bundle.13a4f30d.min.js"></script>

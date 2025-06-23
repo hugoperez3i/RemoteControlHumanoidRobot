@@ -799,7 +799,7 @@
 <p>The move servos query on delayed mode uses the message:</p>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>!s-mALL-e!
 </span></code></pre></div>
-<p>While acting under the <em><a href="../Execution%20Mode/">delayed execution mode</a></em>, the <em>client</em> can use this query to execute movements previously loaded through the normal <a href="../Servo%20Movement/">servo movement query</a>.</p>
+<p>While acting under the <em><a href="../Execution%20Mode/">delayed execution mode</a></em>, the <em>client</em> can use this query to execute movements previously loaded through the normal <a href="../Servo%20Movement/">servo movement query</a>. </p>
 <p>The possible responses for this query by the server are either a relayed generic ACK <a href="../Control%20Query/">control query</a> from the <em>mcu</em> after movement execution, or a negative <a href="../Control%20Query/">control query</a> with one of the following control codes:</p>
 <ul>
 <li><em><code>_NACK_InvalidQuery</code></em> (<code class="language-Cpp highlight"><span class="kt">uint8_t</span><span class="w"> </span><span class="n">c</span><span class="o">=</span><span class="mi">255</span></code>) → If the <a href="../Protocol%20Definition/#client-server-query-format">query format</a> is invalid: contains null-bytes, invalid header or tail sequences, or the query function code is not recognized.</li>
@@ -810,9 +810,34 @@
 <li><em><code>_NACK_MCUOffline</code></em> (<code class="language-Cpp highlight"><span class="kt">uint8_t</span><span class="w"> </span><span class="n">c</span><span class="o">=</span><span class="mi">249</span></code>) → If the selected <em>mcu</em> is not currently connected to the <em>server</em>.</li>
 </ul>
 <hr />
-<p>The communication schema for this query is as follows:</p>
-<div class="tabbed-set tabbed-alternate" data-tabs="1:2"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">Successful Query</label><label for="__tabbed_1_2">Failed Query</label></div>
+<p>The <em>server → mcu</em> portion of this query behaves and uses the same messages than the normal <a href="../Servo%20Movement/#dumbmcu-srvp-query_1">servo movement query relayed to the mcu</a>, with the exception of the message sent to the <strong>SmartMCU</strong>, which uses a different query:</p>
+<div class="tabbed-set tabbed-alternate" data-tabs="1:2"><input checked="checked" id="smartmcu-mall-query" name="__tabbed_1" type="radio" /><input id="dumbmcu-mall-query" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="smartmcu-mall-query">SmartMCU mALL Query</label><label for="dumbmcu-mall-query">DumbMCU mALL Query</label></div>
 <div class="tabbed-content">
+<div class="tabbed-block">
+<div class="language-text highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>-e-!
+</span></code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="language-text highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>-m-[NUMBER_OF_MOVEMENTS]-[SERVO_ID:PWM_SIGNAL]-&lt;...&gt;-[SERVO_ID:PWM_SIGNAL]-!
+</span></code></pre></div>
+<ul>
+<li><em><code>[NUMBER_OF_MOVEMENTS]</code></em> → A single <code class="language-Cpp highlight"><span class="kt">uint8_t</span></code> indicating how many servo movements the query contains. Since it cannot be zero, it's not affected by the offset. </li>
+<li><em><code>[SERVO_ID:PWM_SIGNAL]</code></em> → The information pair <code>SERVO_ID</code>, the id of the servo the client wants to move; and <code>PWM_SIGNAL</code>, the PWM signal for the given servo ID. These two values are separated by the ASCII character <code>:</code> (<code class="language-Cpp highlight"><span class="kt">uint8_t</span><span class="w"> </span><span class="n">c</span><span class="o">=</span><span class="mi">58</span></code>), and for multiple movements, each information pair <code>SERVO_ID:PWM_SIGNAL</code> is separated by a dash <code>-</code> (<code class="language-Cpp highlight"><span class="kt">uint8_t</span><span class="w"> </span><span class="n">c</span><span class="o">=</span><span class="mi">45</span></code>) from the information pair of the following servo movement. Both <code>SERVO_ID</code> (a single <code class="language-Cpp highlight"><span class="kt">uint8_t</span></code> value) and <code>PWM_SIGNAL</code> (a <code class="language-Cpp highlight"><span class="kt">uint16_t</span></code> value) must have <a href="../Protocol%20Definition/#no-binary-zero-convention">the positive +1 offset applied</a>, as they can take value zero.</li>
+</ul>
+</div>
+</div>
+</div>
+<hr />
+<p>The communication schema for this query is as follows:</p>
+<div class="tabbed-set tabbed-alternate" data-tabs="2:3"><input checked="checked" id="successful-query-smartmcu" name="__tabbed_2" type="radio" /><input id="successful-query-dumbmcu" name="__tabbed_2" type="radio" /><input id="failed-query" name="__tabbed_2" type="radio" /><div class="tabbed-labels"><label for="successful-query-smartmcu">Successful Query (SmartMCU)</label><label for="successful-query-dumbmcu">Successful Query (DumbMCU)</label><label for="failed-query">Failed Query</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<p><figure markdown="span">
+    <img alt="mALL comm schema" src="../../assets/small.png#only-light" />
+    <img alt="mALL comm schema" src="../../assets/small_w.png#only-dark" />
+    <figcaption/>
+</figure></p>
+</div>
 <div class="tabbed-block">
 <p><figure markdown="span">
     <img alt="mALL comm schema" src="../../assets/mall.png#only-light" />
@@ -846,6 +871,8 @@
             </div>
           
           
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
 <script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
         </div>
         
@@ -898,7 +925,7 @@
     
     
       
-      <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.instant", "navigation.tabs", "toc.follow", "toc.integrate", "navigation.top"], "search": "../../assets/javascripts/workers/search.d50fe291.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+      <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.instant", "navigation.tabs", "content.tabs.link", "toc.follow", "toc.integrate", "navigation.top"], "search": "../../assets/javascripts/workers/search.d50fe291.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
       <script src="../../assets/javascripts/bundle.13a4f30d.min.js"></script>

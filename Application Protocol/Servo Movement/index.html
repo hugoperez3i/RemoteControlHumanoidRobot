@@ -867,7 +867,7 @@
 <hr />
 <h2 id="client-server-servo-movement-query-format"><em>Client → Server</em> Servo Movement Query Format</h2>
 <p>The servo movement query (which uses the 4-byte code <code>SRVP</code>) is used by the <em>client</em> to issue movement commands for the selected <em>mcu</em>. The query has the structure:</p>
-<div class="tabbed-set tabbed-alternate" data-tabs="1:2"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">SmartMCU SRVP Query</label><label for="__tabbed_1_2">DumbMCU SRVP Query</label></div>
+<div class="tabbed-set tabbed-alternate" data-tabs="1:2"><input checked="checked" id="smartmcu-srvp-query" name="__tabbed_1" type="radio" /><input id="dumbmcu-srvp-query" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="smartmcu-srvp-query">SmartMCU SRVP Query</label><label for="dumbmcu-srvp-query">DumbMCU SRVP Query</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block">
 <div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>!s-SRVP-[NUMBER_OF_MOVEMENTS]-[SERVO_ID:SERVO_POS]-&lt;...&gt;-[SERVO_ID:SERVO_POS]-e!
@@ -907,7 +907,7 @@
 <p>During the second control response, both <code>_NACK_NoActiveMCU</code> and <code>_NACK_MCUOffline</code> represent time-of-check time-of-use conditions catched by the server during query dispatch.</p>
 <h2 id="server-mcu-servo-movement-query-format"><em>Server → MCU</em> Servo Movement Query Format</h2>
 <p>The servo movement query sent by the <em>client</em> must be translated from the <em>client → server</em> into the <em>server → mcu</em> format before forwarding it to the <em>mcu</em>, which makes the query take the form:</p>
-<div class="tabbed-set tabbed-alternate" data-tabs="2:2"><input checked="checked" id="__tabbed_2_1" name="__tabbed_2" type="radio" /><input id="__tabbed_2_2" name="__tabbed_2" type="radio" /><div class="tabbed-labels"><label for="__tabbed_2_1">SmartMCU SRVP Query</label><label for="__tabbed_2_2">DumbMCU SRVP Query</label></div>
+<div class="tabbed-set tabbed-alternate" data-tabs="2:2"><input checked="checked" id="smartmcu-srvp-query_1" name="__tabbed_2" type="radio" /><input id="dumbmcu-srvp-query_1" name="__tabbed_2" type="radio" /><div class="tabbed-labels"><label for="smartmcu-srvp-query_1">SmartMCU SRVP Query</label><label for="dumbmcu-srvp-query_1">DumbMCU SRVP Query</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block">
 <div class="language-text highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>-m-[NUMBER_OF_MOVEMENTS]-[SERVO_ID:SERVO_POS]-&lt;...&gt;-[SERVO_ID:SERVO_POS]-!
@@ -927,7 +927,7 @@
 <p class="admonition-title">How is offset applied</p>
 <p>The offset is introduced by fixing the most significant bit of the <code class="language-Cpp highlight"><span class="kt">uint16_t</span><span class="w"> </span><span class="n">PWM_SIGNAL</span></code> to <code>1</code>, and then adding 1 to the normal PWM signal value. This results in a 15-bit signal with one fewer representable PWM value, a range of [0 → 32766]. On PWM servos that use the full 15-bit resolution over a 180º linear range, this results in a precision loss of approximately 5.493 millidegrees reduction in total range, and 0.1676 microdegrees decrease in angular resolution per step, which is effectively negligible for most use-cases.</p>
 <p>To introduce this offset, the formula <code class="language-Cpp highlight"><span class="n">PWM_SIGNAL</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">pwm</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="p">(</span><span class="mb">0b1</span><span class="o">&lt;&lt;</span><span class="mi">15</span><span class="p">))</span></code> is used; and the formula <code class="language-Cpp highlight"><span class="n">pwm</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">PWM_SIGNAL</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="p">(</span><span class="mb">0b1</span><span class="o">&lt;&lt;</span><span class="mi">15</span><span class="p">))</span></code> is used on the receiving end to undo the offset applied.</p>
-<details class="danger">
+<details class="danger" open="open">
 <summary>Endianness</summary>
 <p>To avoid the <a href="https://en.wikipedia.org/wiki/Endianness#Networking">endianness</a> problem, the protocol introduces a normalized implementation through which <code class="language-Cpp highlight"><span class="kt">uint16_t</span></code> values are split into two <code class="language-Cpp highlight"><span class="kt">uint8_t</span></code> values in a set order (the first byte will be the upper-byte, followed by the lower-byte). The visual representation of this transformation would be:</p>
 <p><figure markdown="span">
@@ -954,7 +954,7 @@
 </div>
 <h2 id="examples-srvp-communication-overview">Examples: SRVP Communication Overview</h2>
 <p>The servo movement query takes on a different communication path depending on whether the <em>server</em> validation passes or fails. The possible schemas are:</p>
-<div class="tabbed-set tabbed-alternate" data-tabs="3:3"><input checked="checked" id="__tabbed_3_1" name="__tabbed_3" type="radio" /><input id="__tabbed_3_2" name="__tabbed_3" type="radio" /><input id="__tabbed_3_3" name="__tabbed_3" type="radio" /><div class="tabbed-labels"><label for="__tabbed_3_1">Successful SRVP Query</label><label for="__tabbed_3_2">Rejected SRVP Query</label><label for="__tabbed_3_3">Rejected by MCU</label></div>
+<div class="tabbed-set tabbed-alternate" data-tabs="3:3"><input checked="checked" id="successful-srvp-query" name="__tabbed_3" type="radio" /><input id="rejected-srvp-query" name="__tabbed_3" type="radio" /><input id="rejected-by-mcu" name="__tabbed_3" type="radio" /><div class="tabbed-labels"><label for="successful-srvp-query">Successful SRVP Query</label><label for="rejected-srvp-query">Rejected SRVP Query</label><label for="rejected-by-mcu">Rejected by MCU</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block">
 <p>For instance, the movement query <code class="language-Cpp highlight"><span class="o">!</span><span class="n">s</span><span class="o">-</span><span class="n">SRVP</span><span class="mi">-2-9</span><span class="o">:</span><span class="mi">13-7</span><span class="o">:</span><span class="mi">18</span><span class="o">-</span><span class="n">e</span><span class="o">!</span></code> would translate to "<em>Perform 2 servo movements: move servo ID 8 to position 12, and servo ID 6 to position 17</em>". Assuming the parameters are valid, and the selected mcu is online, the query validation would succeed, returning the first ACK to the client while forwarding the SRVP query to the mcu. Once the mcu completes the movements, it will reply with a positive control query, which will be relayed back to the client as a second ACK.</p>
@@ -999,6 +999,8 @@
             </div>
           
           
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
 <script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
         </div>
         
@@ -1051,7 +1053,7 @@
     
     
       
-      <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.instant", "navigation.tabs", "toc.follow", "toc.integrate", "navigation.top"], "search": "../../assets/javascripts/workers/search.d50fe291.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+      <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.instant", "navigation.tabs", "content.tabs.link", "toc.follow", "toc.integrate", "navigation.top"], "search": "../../assets/javascripts/workers/search.d50fe291.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
       <script src="../../assets/javascripts/bundle.13a4f30d.min.js"></script>

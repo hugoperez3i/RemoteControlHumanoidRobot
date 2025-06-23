@@ -555,8 +555,26 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#pwm-signal-encoding" class="md-nav__link">
+    <span class="md-ellipsis">
+      PWM Signal Encoding
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#protocol-queries-overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      Protocol Queries Overview
+    </span>
+  </a>
   
 </li>
       
@@ -947,7 +965,7 @@ However, the <a href="../Identification%20Query/">login query</a> poses an excep
 <p>The protocol query uses plain, raw binary, with no codification or encryption. All format and structure characters are standard ASCII.</p>
 <h3 id="client-server-query-format"><em>Client - Server</em> Query Format</h3>
 <p>The message follows a set structure: it always starts with a constant header, <code>!s-</code>, followed by a 4-byte function selector code <code>CODE</code>, and is terminated by a constant tail <code>-e!</code>. This structure can accommodate additional information, for those functions that require it: the information will be added behind the four-byte function selector code (<code>CODE</code>), separated with an additional slash <code>-</code>.</p>
-<div class="tabbed-set tabbed-alternate" data-tabs="1:2"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">No additional information</label><label for="__tabbed_1_2">Containing additional information</label></div>
+<div class="tabbed-set tabbed-alternate" data-tabs="1:2"><input checked="checked" id="no-additional-information" name="__tabbed_1" type="radio" /><input id="containing-additional-information" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="no-additional-information">No additional information</label><label for="containing-additional-information">Containing additional information</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block">
 <div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>!s-CODE-e!
@@ -962,7 +980,7 @@ However, the <a href="../Identification%20Query/">login query</a> poses an excep
 <p>This means that the minimum query length will be <code>11</code> bytes (3 from the header <code>!s-</code>, +4 from the selection code <code>CODE</code>, and +3 from the tail sequence <code>-e!</code>). Any query with less than <code>11 bytes</code> can be safely deleted, as it would mean that some kind of error happened during query formation.</p>
 <h3 id="server-mcu-query-format"><em>Server - MCU</em> Query Format</h3>
 <p>Similarly to the <em>client - server</em> query, the <em>server - mcu</em> query also uses an structured format with header and tail. However, in this second format, the header is reduced to a single <code>-</code>, while the tail sequence takes the form <code>-!</code>. The 4-byte function selector code becomes a single-byte code <code>c</code>, and the additional information, when needed, is added in the exact same format as the <em>client - server</em> format: behind the single-byte code <code>c</code>, and separated with a dash character <code>-</code>.</p>
-<div class="tabbed-set tabbed-alternate" data-tabs="2:2"><input checked="checked" id="__tabbed_2_1" name="__tabbed_2" type="radio" /><input id="__tabbed_2_2" name="__tabbed_2" type="radio" /><div class="tabbed-labels"><label for="__tabbed_2_1">No additional information</label><label for="__tabbed_2_2">Containing additional information</label></div>
+<div class="tabbed-set tabbed-alternate" data-tabs="2:2"><input checked="checked" id="no-additional-information_1" name="__tabbed_2" type="radio" /><input id="containing-additional-information_1" name="__tabbed_2" type="radio" /><div class="tabbed-labels"><label for="no-additional-information_1">No additional information</label><label for="containing-additional-information_1">Containing additional information</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block">
 <div class="language-text highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>-c-!
@@ -974,7 +992,142 @@ However, the <a href="../Identification%20Query/">login query</a> poses an excep
 </div>
 </div>
 </div>
+<h3 id="pwm-signal-encoding"><em>PWM Signal</em> Encoding</h3>
+<p>Some queries, such as <a href="../Upload%20Information/">Upload Calibration Data</a>, <a href="../Servo%20Movement/">Servo Movement</a>, and <a href="../Move%20All%20Query/">Servo Movement (Delayed Mode)</a>, rely on a custom <code class="language-Cpp highlight"><span class="kt">uint16_t</span></code> encoding to transmit the PWM signal.
+This codification is explained in the documentation for each relevant query. It's also available on the following area:</p>
+<details class="abstract">
+<summary>PWM Signal codification</summary>
+<p>Since the PWM signal can take various bit resolution levels, usually ranging from 8-bit to 16-bit, with &gt;16bit being niche or application-specific territory, the procotol allocates 2 bytes (up to 15-bit pwm resolution) for PWM signals on SRVP queries. </p>
+<p>This means that in order to follow <a href="./#no-binary-zero-convention">the protocol no-zero convention</a>, each individual byte needs to incorporate this offset. This is required because, for values of <code>PWM_SIGNAL&lt;255</code>, the upper-byte will always be zero, and for the specific value <code>PWM_SIGNAL=256</code>, the lower-byte will be zero. </p>
+<div class="admonition info">
+<p class="admonition-title">How is offset applied</p>
+<p>The offset is introduced by fixing the most significant bit of the <code class="language-Cpp highlight"><span class="kt">uint16_t</span><span class="w"> </span><span class="n">PWM_SIGNAL</span></code> to <code>1</code>, and then adding 1 to the normal PWM signal value. This results in a 15-bit signal with one fewer representable PWM value, a range of [0 → 32766]. On PWM servos that use the full 15-bit resolution over a 180º linear range, this results in a precision loss of approximately 5.493 millidegrees reduction in total range, and 0.1676 microdegrees decrease in angular resolution per step, which is effectively negligible for most use-cases.</p>
+<p>To introduce this offset, the formula <code class="language-Cpp highlight"><span class="n">PWM_SIGNAL</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">pwm</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="p">(</span><span class="mb">0b1</span><span class="o">&lt;&lt;</span><span class="mi">15</span><span class="p">))</span></code> is used; and the formula <code class="language-Cpp highlight"><span class="n">pwm</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">PWM_SIGNAL</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="p">(</span><span class="mb">0b1</span><span class="o">&lt;&lt;</span><span class="mi">15</span><span class="p">))</span></code> is used on the receiving end to undo the offset applied.</p>
+<details class="danger" open="open">
+<summary>Endianness</summary>
+<p>To avoid the <a href="https://en.wikipedia.org/wiki/Endianness#Networking">endianness</a> problem, the protocol introduces a normalized implementation through which <code class="language-Cpp highlight"><span class="kt">uint16_t</span></code> values are split into two <code class="language-Cpp highlight"><span class="kt">uint8_t</span></code> values in a set order (the first byte will be the upper-byte, followed by the lower-byte). The visual representation of this transformation would be:</p>
+<p><figure markdown="span">
+    <img alt="uint16" src="../../assets/pwmformat.png#only-light" width="400" />
+    <img alt="uint16" src="../../assets/pwmformat_w.png#only-dark" width="400" />
+    <figcaption/>
+</figure></p>
+<p>And the functions used for this are:</p>
+<div class="language-cpp highlight"><table class="highlighttable"><tr><th colspan="2" class="filename"><span class="filename">divideIntoBytes()</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-4-1">1</a></span>
+<span class="normal"><a href="#__codelineno-4-2">2</a></span>
+<span class="normal"><a href="#__codelineno-4-3">3</a></span>
+<span class="normal"><a href="#__codelineno-4-4">4</a></span>
+<span class="normal"><a href="#__codelineno-4-5">5</a></span>
+<span class="normal"><a href="#__codelineno-4-6">6</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1"></a><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="w"> </span><span class="nf">QueryGenerator::divideIntoBytes</span><span class="p">(</span><span class="kt">uint16_t</span><span class="w"> </span><span class="n">u</span><span class="p">){</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2"></a><span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="w"> </span><span class="n">hl</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;&quot;</span><span class="p">;</span>
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3"></a><span class="w">    </span><span class="n">hl</span><span class="o">+=</span><span class="p">(</span><span class="kt">uint8_t</span><span class="p">)(</span><span class="n">u</span><span class="o">&gt;&gt;</span><span class="mi">8</span><span class="p">);</span>
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4"></a><span class="w">    </span><span class="n">hl</span><span class="o">+=</span><span class="p">(</span><span class="kt">uint8_t</span><span class="p">)(</span><span class="n">u</span><span class="o">&amp;</span><span class="mh">0x00ff</span><span class="p">);</span>
+</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">hl</span><span class="p">;</span>
+</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6"></a><span class="p">}</span>
+</span></code></pre></div></td></tr></table></div>
+<div class="language-cpp highlight"><table class="highlighttable"><tr><th colspan="2" class="filename"><span class="filename">restore16int()</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-5-1">1</a></span></pre></div></td><td class="code"><div><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1"></a><span class="kr">inline</span><span class="w"> </span><span class="kt">uint16_t</span><span class="w"> </span><span class="nf">QueryGenerator::restore16int</span><span class="p">(</span><span class="kt">uint8_t</span><span class="w"> </span><span class="n">c0</span><span class="p">,</span><span class="kt">uint8_t</span><span class="w"> </span><span class="n">c1</span><span class="p">){</span><span class="k">return</span><span class="w"> </span><span class="p">(</span><span class="n">c0</span><span class="o">&lt;&lt;</span><span class="mi">8</span><span class="p">)</span><span class="o">+</span><span class="n">c1</span><span class="p">;}</span>
+</span></code></pre></div></td></tr></table></div>
+</details>
+</div>
+</details>
 <hr />
+<h2 id="protocol-queries-overview">Protocol Queries Overview</h2>
+<p>The following table lists all queries defined by the protocol, as well as a brief description and links to each of their documentation pages:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;">Query</th>
+<th style="text-align: center;">Additional Information</th>
+<th style="text-align: left;">Description</th>
+<th style="text-align: center;">Documentation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;"><a href="../Control%20Query/"><code>!s-_ACK-[c]-e!</code></a></td>
+<td style="text-align: center;">Success code</td>
+<td style="text-align: left;">Sent by server or MCU to acknowledge successful execution</td>
+<td style="text-align: center;"><a href="../Control%20Query/">Link</a></td>
+</tr>
+<tr>
+<td style="text-align: center;"><a href="../Control%20Query/"><code>!s-NACK-[c]-e!</code></a></td>
+<td style="text-align: center;">Error code</td>
+<td style="text-align: left;">Sent by server or MCU to indicate an error</td>
+<td style="text-align: center;"><a href="../Control%20Query/">Link</a></td>
+</tr>
+<tr>
+<td style="text-align: center;"><a href="../Identification%20Query/#client-login-query"><code>!s-Client_here-e!</code></a></td>
+<td style="text-align: center;">None</td>
+<td style="text-align: left;">Sent by client to identify and initiate login</td>
+<td style="text-align: center;"><a href="../Identification%20Query/#client-login-query">Link</a></td>
+</tr>
+<tr>
+<td style="text-align: center;"><a href="../Identification%20Query/#mcu-login-query"><code>!s-NodeMCU_here-[info]-e!</code></a></td>
+<td style="text-align: center;">Unique ID + Servo positions and count</td>
+<td style="text-align: left;">Sent by MCU to register itself with the server</td>
+<td style="text-align: center;"><a href="../Identification%20Query/#mcu-login-query">Link</a></td>
+</tr>
+<tr>
+<td style="text-align: center;"><a href="../Robot%20Selection/"><code>!s-sMCU-[info]-e!</code></a></td>
+<td style="text-align: center;">MCU Unique ID</td>
+<td style="text-align: left;">Sent by client to select which MCU to control</td>
+<td style="text-align: center;"><a href="../Robot%20Selection/">Link</a></td>
+</tr>
+<tr>
+<td style="text-align: center;"><a href="../Servo%20Movement/"><code>!s-SRVP-[info]-e!</code></a></td>
+<td style="text-align: center;">Number of movements + Information for each servo movement</td>
+<td style="text-align: left;">Sent by client to execute servo movement on selected MCU</td>
+<td style="text-align: center;"><a href="../Servo%20Movement/">Link</a></td>
+</tr>
+<tr>
+<td style="text-align: center;"><a href="../Servo%20Movement/#server-mcu-servo-movement-query-format"><code>-m-[info]-!</code></a></td>
+<td style="text-align: center;">Number of movements + Information for each servo movement</td>
+<td style="text-align: left;">Sent by server to MCU to execute servo movements</td>
+<td style="text-align: center;"><a href="../Servo%20Movement/#server-mcu-servo-movement-query-format">Link</a></td>
+</tr>
+<tr>
+<td style="text-align: center;"><a href="../Execution%20Mode/#delayed-execution-mode"><code>-u-[info]-!</code></a></td>
+<td style="text-align: center;">Number of movements + Information for each servo movement</td>
+<td style="text-align: left;">Sent by server to MCU to store delayed servo movements</td>
+<td style="text-align: center;"><a href="../Servo%20Movement/">Link</a></td>
+</tr>
+<tr>
+<td style="text-align: center;"><a href="../MCU%20Information/"><code>!s-iMCU-[info]-e!</code></a></td>
+<td style="text-align: center;">On server response: Servo positions and count</td>
+<td style="text-align: left;">Sent by client to request current MCU servo positions</td>
+<td style="text-align: center;"><a href="../MCU%20Information/">Link</a></td>
+</tr>
+<tr>
+<td style="text-align: center;"><a href="../Execution%20Mode/"><code>!s-eMOD-[info]-e!</code></a></td>
+<td style="text-align: center;">The execution mode</td>
+<td style="text-align: left;">Sent by client to set MCU execution mode (real-time or delayed)</td>
+<td style="text-align: center;"><a href="../Execution%20Mode/">Link</a></td>
+</tr>
+<tr>
+<td style="text-align: center;"><a href="../Move%20All%20Query/"><code>!s-mALL-e!</code></a></td>
+<td style="text-align: center;">None</td>
+<td style="text-align: left;">Sent by client to trigger execution of stored servo movements</td>
+<td style="text-align: center;"><a href="../Move%20All%20Query/">Link</a></td>
+</tr>
+<tr>
+<td style="text-align: center;"><a href="../Move%20All%20Query/"><code>-e-!</code></a></td>
+<td style="text-align: center;">None</td>
+<td style="text-align: left;">Sent by server to instruct MCU to execute stored movements</td>
+<td style="text-align: center;"><a href="../Move%20All%20Query/">Link</a></td>
+</tr>
+<tr>
+<td style="text-align: center;"><a href="../Upload%20Information/"><code>!s-uINF-[info]-e!</code></a></td>
+<td style="text-align: center;">Number of servos + calibration data for each servo</td>
+<td style="text-align: left;">Sent by client to upload calibration data to MCU</td>
+<td style="text-align: center;"><a href="../Upload%20Information/">Link</a></td>
+</tr>
+<tr>
+<td style="text-align: center;"><a href="../Server%20Shutdown/"><code>!s-sOFF-e!</code></a></td>
+<td style="text-align: center;">None</td>
+<td style="text-align: left;">Sent by client to shut down the server remotely</td>
+<td style="text-align: center;"><a href="../Server%20Shutdown/">Link</a></td>
+</tr>
+</tbody>
+</table>
 
 
 
@@ -992,6 +1145,8 @@ However, the <a href="../Identification%20Query/">login query</a> poses an excep
             </div>
           
           
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
 <script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
         </div>
         
@@ -1044,7 +1199,7 @@ However, the <a href="../Identification%20Query/">login query</a> poses an excep
     
     
       
-      <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.instant", "navigation.tabs", "toc.follow", "toc.integrate", "navigation.top"], "search": "../../assets/javascripts/workers/search.d50fe291.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+      <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.instant", "navigation.tabs", "content.tabs.link", "toc.follow", "toc.integrate", "navigation.top"], "search": "../../assets/javascripts/workers/search.d50fe291.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
       <script src="../../assets/javascripts/bundle.13a4f30d.min.js"></script>
