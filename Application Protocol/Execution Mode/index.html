@@ -11,6 +11,10 @@
         <link rel="canonical" href="https://hugoperez3i.github.io/RemoteControlHumanoidRobot/Application%20Protocol/Execution%20Mode/">
       
       
+        <link rel="prev" href="../MCU%20Information/">
+      
+      
+        <link rel="next" href="../Move%20All%20Query/">
       
       
       <link rel="icon" href="../../assets/Logo.png">
@@ -70,6 +74,11 @@
     <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
     <label class="md-overlay" for="__drawer"></label>
     <div data-md-component="skip">
+      
+        
+        <a href="#execution-mode" class="md-skip">
+          Skip to content
+        </a>
       
     </div>
     <div data-md-component="announce">
@@ -217,10 +226,12 @@
   
   
   
+    
+  
   
     
     
-      <li class="md-tabs__item">
+      <li class="md-tabs__item md-tabs__item--active">
         <a href="../Protocol%20Definition/" class="md-tabs__link">
           
   
@@ -362,24 +373,29 @@
       
   
   
+    
   
   
+  
     
     
     
     
-      
-      
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
         
           
-          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
             
   
   
@@ -392,7 +408,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_2">
             <span class="md-nav__icon md-icon"></span>
             Application Protocol
@@ -504,6 +520,149 @@
   
   <span class="md-ellipsis">
     Servo Movement
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../MCU%20Information/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    MCU Information
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    Execution Mode
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    Execution Mode
+    
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#delayed-execution-mode" class="md-nav__link">
+    <span class="md-ellipsis">
+      Delayed Execution Mode
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Move%20All%20Query/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Move Servos (Delayed Mode) Query
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Upload%20Information/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Upload MCU Information Query
     
   </span>
   
@@ -677,9 +836,41 @@
 
 
 
-  <h1>Execution Mode</h1>
-
-<p>eMOD</p>
+<h1 id="execution-mode">Execution Mode</h1>
+<hr />
+<p>The execution mode query is used by the <em>client</em> to change the execution mode between <em>delayed</em> and <em>real time</em>. It uses the query:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>!s-eMOD-[EXECUTION_MODE]-e!
+</span></code></pre></div>
+<p>Where the <code>EXECUTION_MODE</code> variable is a single <code>uint8_t</code> binary value that can take two values:</p>
+<ul>
+<li><em><code>_eMOD_Delayed</code></em> (<code class="language-Cpp highlight"><span class="kt">uint8_t</span><span class="w"> </span><span class="n">c</span><span class="o">=</span><span class="mi">100</span></code>) → In order to change the execution mode to <em>delayed</em>.</li>
+<li><em><code>_eMOD_RealTime</code></em> (<code class="language-Cpp highlight"><span class="kt">uint8_t</span><span class="w"> </span><span class="n">c</span><span class="o">=</span><span class="mi">101</span></code>) → In order to change the execution mode to <em>real time</em>.</li>
+</ul>
+<p>And the response from the server is either a positive control query, with the same code provided by the <em>client</em> as confirmation, or a negative control query with the error codes:</p>
+<ul>
+<li><em><code>_NACK_InvalidQuery</code></em> (<code class="language-Cpp highlight"><span class="kt">uint8_t</span><span class="w"> </span><span class="n">c</span><span class="o">=</span><span class="mi">255</span></code>) → If the <a href="../Protocol%20Definition/#client-server-query-format">query format</a> is invalid: contains null-bytes, invalid header or tail sequences, or the query function code is not recognized.</li>
+<li><em><code>_NACK_InvalidParameter</code></em> (<code class="language-Cpp highlight"><span class="kt">uint8_t</span><span class="w"> </span><span class="n">c</span><span class="o">=</span><span class="mi">252</span></code>) → If <code>EXECUTION_MODE</code> has a value different than <code class="language-Cpp highlight"><span class="kt">uint8_t</span><span class="w"> </span><span class="n">c</span><span class="o">=</span><span class="mi">100</span></code> (delayed mode) or <code class="language-Cpp highlight"><span class="kt">uint8_t</span><span class="w"> </span><span class="n">c</span><span class="o">=</span><span class="mi">101</span></code> (real time mode).</li>
+</ul>
+<p>The possible communication schemas for this query are:</p>
+<figure>
+  <img alt="Execution mode comm schema" src="../../assets/emod.png#only-light" />
+  <img alt="Execution mode comm schema" src="../../assets/emod_w.png#only-dark" />
+<br />
+<figcaption>Diagram for a successful and failed change of execution mode</figcaption>
+</figure>
+<h2 id="delayed-execution-mode">Delayed Execution Mode</h2>
+<p>While operating under the <em>delayed execution mode</em>, the <a href="../Servo%20Movement/">servo movement query</a> alters its functionality. Instead of relaying a servo movement query to the <em>mcu</em>, the <em>server</em> will update its internal "target position". If the <em>mcu</em> is of the type <strong>SmartMCU</strong>, the <em>server</em> will send these movements for the <em>mcu</em> to store, but not execute, using the same movement query but replacing the <code>m</code> movement code with a <code>u</code>:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>-u-[NUMBER_OF_MOVEMENTS]-[SERVO_ID:SERVO_POS]-&lt;...&gt;-[SERVO_ID:SERVO_POS]-!
+</span></code></pre></div>
+<p>The query still follows a similar connection schema as the <a href="../Servo%20Movement/">servo movement query</a> on <em>real time</em> mode:</p>
+<figure>
+  <img alt="delayed srvp comm schema" src="../../assets/srvp_d.png#only-light" />
+  <img alt="delayed srvp comm schema" src="../../assets/srvp_d_w.png#only-dark" />
+<br />
+<figcaption>Diagram for a SRVP query on delayed mode</figcaption>
+</figure>
+<p>This query will not be sent to a <em>mcu</em> of the type <strong>DumbMCU</strong>. </p>
+<p>To execute movements while working under <em>delayed execution mode</em>, the client must first configure them by sending one or more <a href="../Servo%20Movement/">servo movement</a> queries. After loading the movements, the client can issue a <a href="../Move%20All%20Query/">move servos (delayed mode) query</a> to execute them.</p>
 
 
 

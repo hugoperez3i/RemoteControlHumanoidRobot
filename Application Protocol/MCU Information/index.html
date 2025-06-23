@@ -11,6 +11,10 @@
         <link rel="canonical" href="https://hugoperez3i.github.io/RemoteControlHumanoidRobot/Application%20Protocol/MCU%20Information/">
       
       
+        <link rel="prev" href="../Servo%20Movement/">
+      
+      
+        <link rel="next" href="../Execution%20Mode/">
       
       
       <link rel="icon" href="../../assets/Logo.png">
@@ -222,10 +226,12 @@
   
   
   
+    
+  
   
     
     
-      <li class="md-tabs__item">
+      <li class="md-tabs__item md-tabs__item--active">
         <a href="../Protocol%20Definition/" class="md-tabs__link">
           
   
@@ -367,24 +373,29 @@
       
   
   
+    
   
   
+  
     
     
     
     
-      
-      
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
         
           
-          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
             
   
   
@@ -397,7 +408,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_2">
             <span class="md-nav__icon md-icon"></span>
             Application Protocol
@@ -509,6 +520,108 @@
   
   <span class="md-ellipsis">
     Servo Movement
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    MCU Information
+    
+  </span>
+  
+
+      </a>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Execution%20Mode/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Execution Mode
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Move%20All%20Query/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Move Servos (Delayed Mode) Query
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Upload%20Information/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Upload MCU Information Query
     
   </span>
   
@@ -684,6 +797,26 @@
 
 <h1 id="mcu-information">MCU Information</h1>
 <hr />
+<p>The MCU Information query, whose code is <code>iMCU</code>, can be used by the <em>client</em> to retrieve the latest <em>mcu</em> data stored at the <em>server</em>.</p>
+<p>The client → server query takes the form:
+<div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>!s-iMCU-e!
+</span></code></pre></div></p>
+<p>While the server response, instead of using a standard <a href="../Control%20Query/">control query</a>, it mirrors the structure of the additional information from the <a href="../Identification%20Query/#mcu-login-query">SmartMCU login query</a>:
+<div class="language-text highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>!s-iMCU-[SERVO_COUNT]-[SERVOPOS(0)]-&lt;...&gt;-[SERVOPOS(SERVO_COUNT-1)]-e!
+</span></code></pre></div>
+Where the variable <code>SERVO_COUNT</code> is a single <code>uint8_t</code> binary value representing the number of servos the selected mcu has, and each <code>SERVOPOS(i)</code> variable is a single <code>uint8_t</code> binary value in the range [1→180], for the current position of the servo with ID=i.</p>
+<p>In the event an error occurs, the server response will use an error control query, with the following possible error codes:</p>
+<ul>
+<li><em><code>_NACK_InvalidQuery</code></em> (<code class="language-Cpp highlight"><span class="kt">uint8_t</span><span class="w"> </span><span class="n">c</span><span class="o">=</span><span class="mi">255</span></code>) → If the <a href="../Protocol%20Definition/#client-server-query-format">query format</a> is invalid: contains null-bytes, invalid header or tail sequences, or the query function code is not recognized.</li>
+<li><em><code>_NACK_NoActiveMCU</code></em> (<code class="language-Cpp highlight"><span class="kt">uint8_t</span><span class="w"> </span><span class="n">c</span><span class="o">=</span><span class="mi">254</span></code>) → If <em>client</em> has not selected a <em>mcu</em> before issuing the MCU Information command.</li>
+</ul>
+<p>The possible communication schemas for this query take the following form:</p>
+<figure>
+  <img alt="MCU Information comm schema" src="../../assets/imcu.png#only-light" />
+  <img alt="MCU Information comm schema" src="../../assets/imcu_w.png#only-dark" />
+<br />
+<figcaption>Diagram for a successful and failed mcu information query</figcaption>
+</figure>
 
 
 
