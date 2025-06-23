@@ -5,7 +5,7 @@ A simple showcase of the telerobotic platform working, in which the Youbionic Ha
 ## Showcase Video 
 <div align="center">
 <video width="480" height="480" controls muted>
-    <source src="../../assets/demoMovs.mp4" type="video/mp4">
+    <source src="../../assets/demoMovs_web.mp4" type="video/mp4">
 </video>
 </div>
 ---

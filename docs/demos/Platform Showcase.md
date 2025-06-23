@@ -2,7 +2,7 @@
 
 A demo of the full platform, where the Youbionic Half is controlled via the JavaFX client, performing arm flexion and head rotation.
 
-![](../assets/Platform.png)
+![](../assets/Platform.webp)
 
 ---
 
@@ -16,16 +16,16 @@ The platform consists of three parts:
 
 === "Youbionic Half"
 
-    ![](../assets/half.png){ width=600, height=600 }
+    ![](../assets/half.webp){ width=600, height=600 }
 
 
 === "Server"
 
-    ![](../assets/Server.png){ width=600, height=600 }
+    ![](../assets/Server.webp){ width=600, height=600 }
 
 === "Verbose serial log (MCU)"
 
-    ![](../assets/Robot%20verbose%20log.png){ width=600, height=600 }
+    ![](../assets/Robot%20verbose%20log.webp){ width=600, height=600 }
 
 ### Power requirements
 
@@ -51,7 +51,7 @@ Brief demonstration of how the JavaFX application can be used to remotely operat
 
 <div align="center">
 <video width="600"  controls muted> 
-    <source src="../../assets/demoJavaFX.mp4" type="video/mp4">
+    <source src="../../assets/demoJavaFX_web.mp4" type="video/mp4">
 </video>
 </div>
 

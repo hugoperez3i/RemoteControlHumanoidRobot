@@ -6,24 +6,21 @@ site_url: https://hugoperez3i.github.io/RemoteControlHumanoidRobot/
 nav:
   - Home:
     - index.md
-  # - Application Protocol: 
-  #   - Application Protocol/Protocol Definition.md
-  #   - Application Protocol/Control Query.md
-  #   - Application Protocol/Identification Query.md
-  #   - Application Protocol/Robot Selection.md
-  #   - Application Protocol/Servo Movement.md
-  #   - Application Protocol/MCU Information.md
-  #   - Application Protocol/Execution Mode.md
-  #   - Application Protocol/Upload Information.md
-  #   - Application Protocol/Server Shutdown.md
-  # # - UE5 Module:
-  #   - 
+  - Application Protocol: 
+    - Application Protocol/Protocol Definition.md
+    - Application Protocol/Control Query.md
+    - Application Protocol/Identification Query.md
+    - Application Protocol/Robot Selection.md
+    - Application Protocol/Servo Movement.md
+    - Application Protocol/MCU Information.md
+    - Application Protocol/Execution Mode.md
+    - Application Protocol/Move All Query.md
+    - Application Protocol/Upload Information.md
+    - Application Protocol/Server Shutdown.md
   - Demo: 
     - demos/Demo Showcase.md
     - demos/Platform Showcase.md
     - demos/UE5 Module Showcase.md
-  # - License:
-  #   - License/License.md
 
 theme:
   name: material
@@ -51,9 +48,9 @@ theme:
   features:
     - navigation.instant
     - navigation.tabs
+    - content.tabs.link
     - toc.follow
     - toc.integrate
-    - navigation.prune
     - navigation.top
 plugins:
   - search
@@ -61,6 +58,7 @@ plugins:
 extra_css:
   - stylesheets/extra.css
 markdown_extensions:
+  - tables
   - pymdownx.highlight:
       anchor_linenums: true
       line_spans: __span
@@ -72,6 +70,9 @@ markdown_extensions:
   - pymdownx.superfences
   - pymdownx.tabbed:
       alternate_style: true
+      slugify: !!python/object/apply:pymdownx.slugs.slugify
+        kwds:
+          case: lower
   - attr_list
   - md_in_html
 extra:

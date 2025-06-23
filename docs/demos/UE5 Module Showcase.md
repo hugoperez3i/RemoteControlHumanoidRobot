@@ -33,7 +33,7 @@ A brief video showcasing how the UE5 RemoteClientSystem can be used to operate t
 
 <div align="center">
 <video width="400"  controls muted> 
-    <source src="../../assets/demoUE5.mp4" type="video/mp4">
+    <source src="../../assets/demoUE5_web.mp4" type="video/mp4">
 </video>
 </div>
 

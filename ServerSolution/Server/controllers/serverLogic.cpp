@@ -182,11 +182,11 @@ std::string serverLogic::dispatchUINF(char* bquery,ControllerInfo* c){
     query.clear();
     query.append(bquery);
 
-    /* [!s]-[uINF]-[number of servos]-[servomin0:servomax0~servomin0:servomax0]-[e!] */
+    /* [!s]-[uINF]-[number of servos]-[servomin0:servomax0-servomin0:servomax0]-[e!] */
     /* [!s-]0-2 (3) Header [xxxx]3-6 (4) Type of Query [x]8(1) Number of servos [servoInfo]10-x((6*NumOfServos)-1) */
 
     uint8_t numServ=query.at(8);
-    if((*c).mcuInfo.servoCount<numServ){return QueryGenerator().nack(_NACK_ServoCountMissmatch);}
+    if((*c).mcuInfo.servoCount!=numServ){return QueryGenerator().nack(_NACK_ServoCountMissmatch);}
 
     if(query.length()<12+(6*numServ)){return QueryGenerator().nack(_NACK_InvalidQuery);}
     
@@ -196,7 +196,7 @@ std::string serverLogic::dispatchUINF(char* bquery,ControllerInfo* c){
     for (size_t i = 0; i < numServ; i++){
         miV.emplace_back((QueryGenerator().restore16int(query.at(i*6),query.at(1+(i*6))))-1-(0b1<<15));
         maV.emplace_back((QueryGenerator().restore16int(query.at(3+(i*6)),query.at(4+(i*6))))-1-(0b1<<15));
-        if((miV[i]<SERVOMIN)||(maV[i]>SERVOMAX)){return QueryGenerator().nack(_NACK_InvalidParameter);}
+        if((miV[i]<0)||(maV[i]>32766)){return QueryGenerator().nack(_NACK_InvalidParameter);}
     }
 
     (*c).mcuInfo.servos_MIN_MAX.clear();
