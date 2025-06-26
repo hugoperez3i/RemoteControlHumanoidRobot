@@ -31,19 +31,6 @@ std::string QueryGenerator::robotInformation(std::vector<uint8_t> pos){
 
 /* MCU functions Query[Server -> MCU] */
 
-/* -- Query format --
-
-    -<m/u/e/c>-s:<id>-p:<0-180>-!
-
-        m: move servo (Update a desired position and move the servo)
-        u: update servo positon (Update a desired position, dont move)
-        e: move all servos to desired positions (No update)
-        c: Set current servo positions (get the current positions from srv)
-        -s:<id> : Servo to be moved/updated
-        -p:<0-180> : Position the servo should be updated/moved to
-
-*/
-
 /* Support function for Dumb functions */
 
 std::string QueryGenerator::divideIntoBytes(uint16_t u){
@@ -97,9 +84,5 @@ std::string QueryGenerator::smrt_updtServo(uint32_t flag,std::vector<uint8_t> po
     }
     q+="!";
     q.replace(3,1,1,count);
-    return q;
-}
-std::string QueryGenerator::smrt_currPos(){
-    std::string q = "-c-s:";
     return q;
 }

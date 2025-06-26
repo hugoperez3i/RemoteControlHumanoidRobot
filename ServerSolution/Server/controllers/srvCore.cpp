@@ -376,7 +376,7 @@ void srvCore::runServer(){
         //Give the sck list to select
         switch (select(0,&rSCK,NULL,NULL,&timeout)){
             case -1:
-                /* #To-Do: Select Error - handle it? */
+                writeToLog("Select Error");
                 break;
             case 0:
                 /* Timeout - Shoould happen every 10s, used to check if shutdown was issued */
@@ -389,9 +389,7 @@ void srvCore::runServer(){
                     try{
                         SOCKET sck = rSCK.fd_array[i];
                         //Iterate through all the sockets ready to accept/read
-    
-                        FD_CLR(sck,&rSCK);//Remove the sck being handled from the list 
-    
+        
                         if(sck==sckListen){
                             //Main socket - Accept new connection
                             SOCKET s = accept(sckListen,NULL,NULL);
@@ -402,8 +400,6 @@ void srvCore::runServer(){
                             userHandler(sck);
                         }
                         
-                        if(rSCK.fd_count==0)break;
-                            //Check whether all rdy sockets were handled
                     }catch(const std::exception& e){
                         writeToLog(e.what());
                     }
@@ -425,7 +421,7 @@ void srvCore::runServer(){
 
 }
 
-void srvCore::signalHandler(int sig) {
+void srvCore::signalHandler(int sig){
     srvCore::sigCode = static_cast<uint8_t>(sig);
     srvCore::srvUp = false;
 }

@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.10)
 project(ControlServer VERSION 1.0.0)
 
+# Full CMake tutorial playlist: https://www.youtube.com/playlist?list=PLalVdRk2RC6o5GHu618ARWh0VO0bFlif4
+
 set(CMAKE_CXX_STANDARD 17)
 
 set(SOURCES
@@ -13,15 +15,15 @@ add_subdirectory(test)
 
 set(EXECUTABLE_NAME "ControlServer")
 add_executable(${EXECUTABLE_NAME} ${SOURCES})
-set_target_properties(ControlServer PROPERTIES WIN32_EXECUTABLE false)  # keep false to include console output
-target_link_libraries(ControlServer 
+set_target_properties(${EXECUTABLE_NAME} PROPERTIES WIN32_EXECUTABLE false)  # keep false to include console output
+target_link_libraries(${EXECUTABLE_NAME} 
     ControllersLib
     ws2_32
     SQLite3
 )
 
 
-install(TARGETS ControlServer RUNTIME DESTINATION bin)
+install(TARGETS ${EXECUTABLE_NAME} RUNTIME DESTINATION bin)
 
 # https://cmake.org/cmake/help/book/mastering-cmake/chapter/Packaging%20With%20CPack.html
 

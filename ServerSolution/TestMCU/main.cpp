@@ -16,7 +16,7 @@ int main(int argc, char const *argv[]){
     // std::string str = "!s-NodeMCU_here-dumbMCU-1-x-e!";
     //     str.replace(24, 1, 1, 6);
     //     str.replace(26, 1, 1, 187);
-    std::string str = "!s-NodeMCU_here-smartMCU-6-0-1-2-3-4-5-e!";
+    std::string str = "!s-NodeMCU_here-SmartMCU-6-0-1-2-3-4-5-e!";
         str.replace(25, 1, 1, 6);
         str.replace(27, 1, 1, 25);
         str.replace(29, 1, 1, 25);
@@ -32,6 +32,7 @@ int main(int argc, char const *argv[]){
     while(true){
         q=c.rcv();
         c.snd(ack.data());
+        //    usleep(500000); // Wait .5 seconds
     }
 
 }
